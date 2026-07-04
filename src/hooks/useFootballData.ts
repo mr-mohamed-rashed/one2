@@ -417,15 +417,16 @@ export function useStandings() {
 }
 
 // ---------- Top Scorers ----------
-export function useTopScorers() {
+export function useTopScorers(tournament: string = 'كأس العالم 2026') {
   return useQuery({
-    queryKey: ['topscorers'],
+    queryKey: ['topscorers', tournament],
     queryFn: async () => {
       try {
         // 1. Fetch from database first (Primary Source)
         const { data: dbData } = await supabase
           .from('player_stats')
           .select('*')
+          .eq('tournament', tournament)
           .order('goals', { ascending: false })
           .order('assists', { ascending: false });
           
@@ -537,14 +538,15 @@ export function useTopScorers() {
   });
 }
 
-export function useBestPlayers() {
+export function useBestPlayers(tournament: string = 'كأس العالم 2026') {
   return useQuery({
-    queryKey: ['bestplayers'],
+    queryKey: ['bestplayers', tournament],
     queryFn: async () => {
       try {
         const { data, error } = await supabase
           .from('player_stats')
           .select('*')
+          .eq('tournament', tournament)
           .order('motm_awards', { ascending: false })
           .order('goals', { ascending: false });
           
@@ -575,14 +577,15 @@ export function useBestPlayers() {
   });
 }
 
-export function usePlayerCards() {
+export function usePlayerCards(tournament: string = 'كأس العالم 2026') {
   return useQuery({
-    queryKey: ['playercards'],
+    queryKey: ['playercards', tournament],
     queryFn: async () => {
       try {
         const { data, error } = await supabase
           .from('player_stats')
           .select('*')
+          .eq('tournament', tournament)
           .or('yellow_cards.gt.0,red_cards.gt.0')
           .order('red_cards', { ascending: false })
           .order('yellow_cards', { ascending: false });
