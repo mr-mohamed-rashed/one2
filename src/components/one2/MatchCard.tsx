@@ -109,6 +109,9 @@ export function MatchCard({ match, showCountdown, onClick }: MatchCardProps) {
     window.open(targetUrl, '_blank', 'noopener,noreferrer');
   };
 
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoId = getYouTubeVideoId(match.highlight_url || '');
+
   return (
     <Card
       className={cn(
@@ -197,17 +200,29 @@ export function MatchCard({ match, showCountdown, onClick }: MatchCardProps) {
 
       {isFinished && (
         <div className="px-4 pb-4">
-          {getYouTubeEmbedUrl(match.highlight_url || '') ? (
-            <div className="aspect-video w-full overflow-hidden rounded-xl bg-black/50 ring-1 ring-border shadow-lg relative [&_.react-player\_\_preview]:rounded-xl [&_.react-player\_\_preview]:object-cover [&_iframe]:rounded-xl">
-               <ReactPlayer
-                  url={match.highlight_url}
-                  width="100%"
-                  height="100%"
-                  className="absolute inset-0"
-                  light={true}
-                  playing={true}
-                  controls={true}
+          {videoId ? (
+            <div className="aspect-video w-full overflow-hidden rounded-xl bg-black/80 ring-1 ring-border shadow-lg relative cursor-pointer" onClick={() => setIsPlaying(true)}>
+              {!isPlaying ? (
+                <>
+                  <img 
+                    src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`} 
+                    alt="Video thumbnail" 
+                    className="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity" 
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-primary/90 text-primary-foreground rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(34,197,94,0.6)] backdrop-blur-sm transition-transform hover:scale-110">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="ml-1"><path d="M5 3l14 9-14 9V3z"/></svg>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <iframe
+                  src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+                  className="w-full h-full border-0 absolute inset-0 rounded-xl"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
                 />
+              )}
             </div>
           ) : match.highlight_url ? (
             <Button asChild variant="outline" className="w-full font-bold border-primary/40 text-primary hover:bg-primary/10">
@@ -238,17 +253,15 @@ export function MatchCard({ match, showCountdown, onClick }: MatchCardProps) {
   );
 }
 
-function getYouTubeEmbedUrl(url: string): string | null {
+function getYouTubeVideoId(url: string): string | null {
   if (!url) return null;
   try {
     const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
     if (urlObj.hostname.includes('youtube.com')) {
-      const videoId = urlObj.searchParams.get('v');
-      return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=0` : null;
+      return urlObj.searchParams.get('v');
     }
     if (urlObj.hostname === 'youtu.be') {
-      const videoId = urlObj.pathname.slice(1);
-      return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=0` : null;
+      return urlObj.pathname.slice(1);
     }
   } catch (e) {
     return null;
