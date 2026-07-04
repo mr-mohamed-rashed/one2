@@ -38,6 +38,7 @@ export function PlaymakersTable() {
 
   // Sort by assists descending
   const playmakersList = [...scorers]
+    .filter(s => s.assists > 0)
     .sort((a, b) => {
       if (b.assists !== a.assists) return b.assists - a.assists;
       return b.goals - a.goals;

@@ -61,7 +61,7 @@ export function TopScorersTable({ compact = false }: { compact?: boolean }) {
   const [sortKey, setSortKey] = useState<SortKey>('rank');
   const [isAscending, setIsAscending] = useState(true);
 
-  const scorers = [...(scorersData ?? [])].sort((a, b) => {
+  const scorers = [...(scorersData ?? [])].filter(s => s.goals > 0).sort((a, b) => {
     const first = a[sortKey] as number;
     const second = b[sortKey] as number;
     return isAscending ? first - second : second - first;
@@ -118,9 +118,6 @@ export function TopScorersTable({ compact = false }: { compact?: boolean }) {
               <TableHead className={cn('hidden md:table-cell', lang === 'ar' && 'font-arabic')}>{t('club', lang)}</TableHead>
               <TableHead className="text-center">
                 <SortButton sortBy="goals" label={t('goals', lang)} />
-              </TableHead>
-              <TableHead className="text-center hidden sm:table-cell">
-                <SortButton sortBy="assists" label={t('assists', lang)} />
               </TableHead>
               <TableHead className="text-center hidden md:table-cell">
                 <SortButton sortBy="matches" label={t('matches', lang)} />
@@ -205,9 +202,6 @@ export function TopScorersTable({ compact = false }: { compact?: boolean }) {
                   )}>
                     {scorer.goals}
                   </span>
-                </TableCell>
-                <TableCell className="text-center hidden sm:table-cell font-semibold tabular-nums text-muted-foreground">
-                  {scorer.assists}
                 </TableCell>
                 <TableCell className="text-center hidden md:table-cell text-muted-foreground tabular-nums">
                   {scorer.matches}
