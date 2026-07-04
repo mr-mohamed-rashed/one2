@@ -3,6 +3,7 @@ import { Calendar, ExternalLink, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import ReactPlayer from 'react-player/lazy';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/context/LanguageContext';
 import { trackVisitEvent } from '@/hooks/useVisitTracking';
@@ -197,13 +198,15 @@ export function MatchCard({ match, showCountdown, onClick }: MatchCardProps) {
       {isFinished && (
         <div className="px-4 pb-4">
           {getYouTubeEmbedUrl(match.highlight_url || '') ? (
-            <div className="aspect-video w-full overflow-hidden rounded-xl bg-black/50 ring-1 ring-border shadow-lg relative">
-               <iframe
-                  src={getYouTubeEmbedUrl(match.highlight_url || '')!}
-                  className="w-full h-full border-0 absolute inset-0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  loading="lazy"
+            <div className="aspect-video w-full overflow-hidden rounded-xl bg-black/50 ring-1 ring-border shadow-lg relative [&_.react-player\_\_preview]:rounded-xl [&_.react-player\_\_preview]:object-cover [&_iframe]:rounded-xl">
+               <ReactPlayer
+                  url={match.highlight_url}
+                  width="100%"
+                  height="100%"
+                  className="absolute inset-0"
+                  light={true}
+                  playing={true}
+                  controls={true}
                 />
             </div>
           ) : match.highlight_url ? (
