@@ -3,7 +3,7 @@ import { Calendar, ExternalLink, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import ReactPlayer from 'react-player/lazy';
+import ReactPlayer from 'react-player';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/context/LanguageContext';
 import { trackVisitEvent } from '@/hooks/useVisitTracking';
