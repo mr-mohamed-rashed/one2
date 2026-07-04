@@ -133,7 +133,7 @@ export function StatsSummaryCard() {
               </div>
             </div>
             <span className="text-4xl font-black font-display text-foreground ps-4">
-              {topPlaymaker.assists || topPlaymaker.goals || 3}
+              {topPlaymaker.assists ?? 0}
             </span>
           </div>
         </div>

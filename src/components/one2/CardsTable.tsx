@@ -117,6 +117,13 @@ export function CardsTable() {
                 </TableCell>
               </TableRow>
             ))}
+            {!isLoading && displayPlayers.length === 0 && (
+              <TableRow className="border-border hover:bg-transparent">
+                <TableCell colSpan={5} className={cn("text-center py-12 text-muted-foreground", lang === 'ar' && 'font-arabic')}>
+                  {lang === 'ar' ? 'لا توجد بطاقات مسجلة حتى الآن' : 'No cards recorded yet'}
+                </TableCell>
+              </TableRow>
+            )}
             {!isLoading && displayPlayers.map((player: any) => {
               const colors = getRankColors(player.rank);
               return (

@@ -38,7 +38,7 @@ const T = {
   standingsTitle: { en: 'Standings & Rankings', ar: 'الترتيب والتصنيف' },
   standingsSub: { en: 'Golden Boot & best player rankings', ar: 'سباق الحذاء الذهبي وأفضل اللاعبين' },
   topScorers: { en: 'Top Scorers', ar: 'الهدافون' },
-  bestPlayers: { en: 'Contributions', ar: 'صانعو الأهداف' },
+  bestPlayers: { en: 'Contributions', ar: 'المساهمات' },
 
   player: { en: 'Player', ar: 'اللاعب' },
   club: { en: 'Club', ar: 'النادي' },
