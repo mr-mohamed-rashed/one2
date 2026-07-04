@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useNewsCategories } from '@/hooks/useNewsCategories';
 
 interface PlayerStat {
   id: string;
@@ -23,6 +24,7 @@ interface PlayerStat {
 type TabType = 'goals' | 'assists' | 'motm' | 'cards';
 
 export function TopScorersTab() {
+  const { categories } = useNewsCategories();
   const [scorers, setScorers] = useState<PlayerStat[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -396,12 +398,17 @@ export function TopScorersTab() {
             <p className="text-sm text-muted-foreground">قم بتحديد البطولة قبل إضافة أو إدخال البيانات</p>
           </div>
           <div className="w-full md:w-72">
-            <Input
+            <select
               value={tournament}
               onChange={(e) => setTournament(e.target.value)}
-              placeholder="مثال: كأس العالم 2026"
-              className="h-12 border-primary/50 font-bold text-center text-lg bg-background"
-            />
+              className="flex h-12 w-full rounded-md border border-primary/50 bg-background px-3 py-2 text-center text-lg font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              dir="rtl"
+            >
+              <option value="كأس العالم 2026">كأس العالم 2026</option>
+              {categories.filter(c => c !== 'News 2026').map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
           </div>
         </div>
       </Card>
