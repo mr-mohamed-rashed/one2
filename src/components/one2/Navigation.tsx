@@ -33,8 +33,14 @@ export function Navigation() {
           {/* Brand */}
           <NavLink to="/" className="flex items-center group shrink-0">
             <div dir="ltr" className="flex items-baseline font-display font-black tracking-tighter select-none">
-              <span className="text-white text-3xl drop-shadow-[0_2px_3px_rgba(0,0,0,0.6)]">One</span>
-              <span className="text-primary text-[2.2rem] drop-shadow-[0_0_12px_rgba(34,197,94,0.8)] ml-2" style={{ textShadow: '0 2px 5px rgba(0,0,0,0.5), 0 0 20px rgba(34,197,94,0.6)' }}>2</span>
+              <span 
+                className="text-primary text-3xl tracking-tight" 
+                style={{ 
+                  textShadow: '0 1px 0 hsl(145, 70%, 25%), 0 2px 0 hsl(145, 70%, 20%), 0 3px 0 hsl(145, 70%, 15%), 0 4px 0 hsl(145, 70%, 10%), 0 0 15px rgba(34,197,94,0.6), 0 0 30px rgba(34,197,94,0.4)' 
+                }}
+              >
+                One2
+              </span>
             </div>
           </NavLink>
 
