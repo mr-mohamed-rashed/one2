@@ -73,7 +73,7 @@ export function LiveCommentary() {
       if (document.hidden) return;
       const sample = samples[i % samples.length];
       i++;
-      setEvents((prev) => [{ ...sample, id: Date.now() }, ...prev]);
+      setEvents((prev) => [{ ...sample, id: Date.now() }, ...prev].slice(0, 50));
     }, 15000);
     return () => window.clearInterval(id);
   }, []);

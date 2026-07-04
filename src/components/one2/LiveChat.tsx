@@ -230,7 +230,7 @@ export function LiveChat({ matchId: _ignoredMatchId = 'general', variant = 'defa
         if (!sender?.is_banned) {
           setMessages((prev) => {
             if (prev.some((m) => m.id === msg.id)) return prev;
-            return [...prev, msg];
+            return [...prev, msg].slice(-100);
           });
           
           // Play sound if message is not from me
@@ -326,7 +326,7 @@ export function LiveChat({ matchId: _ignoredMatchId = 'general', variant = 'defa
           } else if (data) {
             setMessages((prev) => {
               if (prev.some((m) => m.id === data.id)) return prev;
-              return [...prev, data as ChatMessage];
+              return [...prev, data as ChatMessage].slice(-100);
             });
           }
         });
@@ -421,7 +421,7 @@ export function LiveChat({ matchId: _ignoredMatchId = 'general', variant = 'defa
       setShowEmojis(false);
       setMessages((prev) => {
         if (prev.some((m) => m.id === data.id)) return prev;
-        return [...prev, data as ChatMessage];
+        return [...prev, data as ChatMessage].slice(-100);
       });
     }
     setIsSending(false);
