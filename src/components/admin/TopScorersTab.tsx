@@ -243,13 +243,29 @@ export function TopScorersTab() {
         }
       }
       
-      // Step 4: Upsert the valid ones
-      for (let i = 0; i < validPayloads.length; i += 50) {
-        const chunk = validPayloads.slice(i, i + 50);
-        const { error } = await supabase.from('player_stats').upsert(chunk);
-        if (error) {
-          console.error('Error inserting chunk:', error);
-          toast({ title: 'فشل إدخال بعض البيانات', description: error.message, variant: 'destructive' });
+      // Step 4: Upsert existing players and Insert new players separately
+      const playersToUpdate = validPayloads.filter(p => p.id);
+      const playersToInsert = validPayloads.filter(p => !p.id);
+
+      if (playersToUpdate.length > 0) {
+        for (let i = 0; i < playersToUpdate.length; i += 50) {
+          const chunk = playersToUpdate.slice(i, i + 50);
+          const { error } = await supabase.from('player_stats').upsert(chunk);
+          if (error) {
+            console.error('Error updating chunk:', error);
+            toast({ title: 'فشل تحديث البيانات', description: error.message, variant: 'destructive' });
+          }
+        }
+      }
+
+      if (playersToInsert.length > 0) {
+        for (let i = 0; i < playersToInsert.length; i += 50) {
+          const chunk = playersToInsert.slice(i, i + 50);
+          const { error } = await supabase.from('player_stats').insert(chunk);
+          if (error) {
+            console.error('Error inserting chunk:', error);
+            toast({ title: 'فشل إدخال البيانات الجديدة', description: error.message, variant: 'destructive' });
+          }
         }
       }
       
