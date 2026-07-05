@@ -5,6 +5,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useTopScorers } from '@/hooks/useFootballData';
 import { cn } from '@/lib/utils';
 import type { Scorer } from '@/lib/footballData';
+import { getCountryFlag } from '@/lib/flags';
 
 const BootIcon = ({ className, rank }: { className?: string, rank: number }) => {
   const gradientId = `assist-grad-${rank}`;
@@ -118,16 +119,7 @@ export function PlaymakersTable() {
                         {isTop3 && <BootIcon className="w-5 h-5 drop-shadow-md" rank={scorer.rank} />}
                       </div>
                       <div className="flex items-center gap-1.5 text-xs text-muted-foreground md:hidden mt-0.5">
-                        {scorer.country?.flag && (
-                          <img 
-                            src={scorer.country.flag} 
-                            alt={scorer.club} 
-                            className="w-4.5 h-3 object-cover rounded-sm border border-border/40"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = 'https://flagcdn.com/w160/un.png';
-                            }}
-                          />
-                        )}
+                        <span className="text-sm drop-shadow-sm">{getCountryFlag(scorer.club)}</span>
                         <span>{scorer.club}</span>
                       </div>
                     </div>
@@ -135,16 +127,7 @@ export function PlaymakersTable() {
                 </TableCell>
                 <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
-                    {scorer.country?.flag && (
-                      <img 
-                        src={scorer.country.flag} 
-                        alt={scorer.club} 
-                        className="w-5 h-3.5 object-cover rounded-sm border border-border/40"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = 'https://flagcdn.com/w160/un.png';
-                        }}
-                      />
-                    )}
+                    <span className="text-lg drop-shadow-sm">{getCountryFlag(scorer.club)}</span>
                     <span>{scorer.club}</span>
                   </div>
                 </TableCell>

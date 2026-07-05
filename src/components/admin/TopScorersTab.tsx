@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useNewsCategories } from '@/hooks/useNewsCategories';
+import { getCountryFlag } from '@/lib/flags';
 
 interface PlayerStat {
   id: string;
@@ -527,8 +528,11 @@ export function TopScorersTab() {
                 <div key={scorer.id} className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
                   <div>
                     <div className="font-bold text-foreground">{scorer.player_name}</div>
-                    <div className="text-sm text-muted-foreground flex gap-3 mt-1">
-                      <span>{scorer.team_name}</span>
+                    <div className="text-sm text-muted-foreground flex gap-3 mt-1 items-center">
+                      <span className="flex items-center gap-1">
+                        <span className="text-lg">{getCountryFlag(scorer.team_name)}</span>
+                        {scorer.team_name}
+                      </span>
                       {activeTab === 'goals' && <span className="font-bold text-primary">الأهداف: {scorer.goals}</span>}
                       {activeTab === 'assists' && <span className="font-bold text-emerald-500">الأسيست: {scorer.assists}</span>}
                       {activeTab === 'motm' && <span className="font-bold text-purple-500">رجل المباراة: {scorer.motm_awards}</span>}
