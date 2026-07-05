@@ -104,16 +104,21 @@ export function TopScorersTab() {
         let teamName = "";
         let playerName = "";
         
-        for (let len = 2; len <= Math.floor(rest.length / 2); len++) {
-          const endPart1 = rest.slice(rest.length - len);
-          const endPart2 = rest.slice(rest.length - len * 2, rest.length - len);
-          if (endPart1.replace(/\s/g, '') === endPart2.replace(/\s/g, '')) {
-            teamName = endPart1.trim();
-            playerName = rest.slice(0, rest.length - len * 2).trim();
-          }
+        let found = false;
+        for (let len = Math.floor(rest.length / 2); len >= 2; len--) {
+           const suffix = rest.slice(-len).trim();
+           if (!suffix) continue;
+           
+           const stringWithoutSuffix = rest.slice(0, rest.lastIndexOf(suffix));
+           if (stringWithoutSuffix.trim().endsWith(suffix)) {
+               teamName = suffix;
+               playerName = stringWithoutSuffix.slice(0, stringWithoutSuffix.lastIndexOf(suffix)).trim();
+               found = true;
+               break;
+           }
         }
         
-        if (!teamName) {
+        if (!found) {
           teamName = rest.slice(Math.floor(rest.length * 0.5)).trim();
           playerName = rest.slice(0, Math.floor(rest.length * 0.5)).trim();
         }
