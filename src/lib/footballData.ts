@@ -590,12 +590,6 @@ const UPCOMING_FIXTURES: Match[] = [
     home: teams.JOR, away: teams.ARG, homeScore: 0, awayScore: 0,
     venue: 'Hard Rock Stadium, Miami',
   },
-  {
-    id: 'sf_eng_arg', competition: 'FIFA World Cup 2026', stage: 'Semi-Final',
-    date: '2026-07-15T19:00:00Z', status: 'upcoming',
-    home: teams.ENG, away: teams.ARG, homeScore: 0, awayScore: 0,
-    venue: 'MetLife Stadium, New Jersey',
-  },
 ];
 
 /**
@@ -650,7 +644,29 @@ const FINISHED_FIXTURES: Match[] = [
     home: teams.FRA, away: teams.ESP, homeScore: 0, awayScore: 2, winnerId: 'ESP',
     venue: 'AT&T Stadium, Dallas',
   },
+  {
+    id: 'sf_eng_arg', competition: 'FIFA World Cup 2026', stage: 'Semi-Final',
+    date: '2026-07-15T19:00:00Z', status: 'finished',
+    home: teams.ENG, away: teams.ARG, homeScore: 1, awayScore: 2, winnerId: 'ARG',
+    venue: 'MetLife Stadium, New Jersey',
+  },
 ];
+
+// Added Upcoming Final matches
+UPCOMING_FIXTURES.push(
+  {
+    id: 'third_place_fra_eng', competition: 'FIFA World Cup 2026', stage: 'Third place play-off',
+    date: '2026-07-18T21:00:00Z', status: 'upcoming',
+    home: teams.FRA, away: teams.ENG, homeScore: 0, awayScore: 0,
+    venue: 'Hard Rock Stadium, Miami',
+  },
+  {
+    id: 'final_esp_arg', competition: 'FIFA World Cup 2026', stage: 'Final',
+    date: '2026-07-19T19:00:00Z', status: 'upcoming',
+    home: teams.ESP, away: teams.ARG, homeScore: 0, awayScore: 0,
+    venue: 'MetLife Stadium, New Jersey',
+  }
+);
 
 /**
  * Pre-tournament top scorer predictions / qualification stats
