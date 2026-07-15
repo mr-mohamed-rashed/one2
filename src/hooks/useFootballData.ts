@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { teams } from '@/lib/footballData';
+import { teams, getFinishedMatches, getUpcomingMatches, getLiveMatches } from '@/lib/footballData';
 import type { Match, Scorer } from '@/lib/footballData';
 import { queryClient } from '@/App';
 
@@ -143,6 +143,7 @@ export function useLiveFixtures() {
         } else if (data?.response?.length) {
           results = data.response.map(mapFixture);
         }
+        results = [...results, ...getLiveMatches()];
         
         if (!results) return [];
         
@@ -181,6 +182,7 @@ export function useUpcomingFixtures() {
         } else if (data?.response?.length) {
           results = getUpcomingOnly(data.response.map(mapFixture));
         }
+        results = [...results, ...getUpcomingMatches()];
         
         const now = Date.now();
         return results
@@ -230,6 +232,7 @@ export function useResults() {
         } else if (data?.response?.length) {
           proxyResults = getFinishedOnly(data.response.map(mapFixture));
         }
+        proxyResults = [...proxyResults, ...getFinishedMatches()];
         
         proxyResults = proxyResults.map(m => {
           const homeTeam = normalizeTeam(m.home.name, m.home.id);
