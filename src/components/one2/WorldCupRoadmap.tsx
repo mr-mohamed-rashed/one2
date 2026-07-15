@@ -165,8 +165,14 @@ export function WorldCupRoadmap() {
     <Card className="relative w-full overflow-hidden border-border bg-gradient-card p-4 sm:p-8">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,hsl(var(--primary)/0.15),transparent_40%)] pointer-events-none" />
       
-      <div className="w-full overflow-hidden" dir="ltr">
-        <div className="w-full flex justify-between items-stretch gap-1 sm:gap-2 py-4 sm:py-8">
+      <div className="mb-4 text-center sm:hidden">
+        <p className={cn("text-xs text-muted-foreground", isAr && "font-arabic")}>
+          {isAr ? "📱 اسحب يميناً ويساراً أو قم بتدوير الهاتف لرؤية الشجرة كاملة" : "📱 Swipe left/right or rotate your phone to view the full bracket"}
+        </p>
+      </div>
+
+      <div className="w-full overflow-x-auto pb-6 custom-scrollbar" dir="ltr">
+        <div className="min-w-[900px] md:min-w-full flex justify-between items-stretch gap-1 sm:gap-2 py-4 sm:py-8 px-2">
           
           {/* Left Side */}
           <BracketNode match={m29} side="left" isAr={isAr}>
