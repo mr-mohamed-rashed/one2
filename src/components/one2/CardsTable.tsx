@@ -7,7 +7,6 @@ import { useLanguage } from '@/context/LanguageContext';
 import { usePlayerCards } from '@/hooks/useFootballData';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
-import type { player } from '@/lib/footballData';
 import { getCountryFlag } from '@/lib/flags';
 
 type SortKey = 'rank' | 'red_cards' | 'yellow_cards';
