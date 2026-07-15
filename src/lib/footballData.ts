@@ -590,6 +590,12 @@ const UPCOMING_FIXTURES: Match[] = [
     home: teams.JOR, away: teams.ARG, homeScore: 0, awayScore: 0,
     venue: 'Hard Rock Stadium, Miami',
   },
+  {
+    id: 'sf_eng_arg', competition: 'FIFA World Cup 2026', stage: 'Semi-Final',
+    date: '2026-07-15T19:00:00Z', status: 'upcoming',
+    home: teams.ENG, away: teams.ARG, homeScore: 0, awayScore: 0,
+    venue: 'MetLife Stadium, New Jersey',
+  },
 ];
 
 /**
@@ -636,6 +642,12 @@ const FINISHED_FIXTURES: Match[] = [
     id: 'u18', competition: 'FIFA World Cup 2026', stage: 'Group L - Match Day 1',
     date: '2026-06-17T20:00:00Z', status: 'finished',
     home: teams.ENG, away: teams.CRO, homeScore: 1, awayScore: 1,
+    venue: 'AT&T Stadium, Dallas',
+  },
+  {
+    id: 'sf_fra_esp', competition: 'FIFA World Cup 2026', stage: 'Semi-Final',
+    date: '2026-07-14T19:00:00Z', status: 'finished',
+    home: teams.FRA, away: teams.ESP, homeScore: 0, awayScore: 2, winnerId: 'ESP',
     venue: 'AT&T Stadium, Dallas',
   },
 ];
