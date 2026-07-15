@@ -165,14 +165,8 @@ export function WorldCupRoadmap() {
     <Card className="relative w-full overflow-hidden border-border bg-gradient-card p-4 sm:p-8">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,hsl(var(--primary)/0.15),transparent_40%)] pointer-events-none" />
       
-      <div className="mb-4 text-center sm:hidden">
-        <p className={cn("text-xs text-muted-foreground", isAr && "font-arabic")}>
-          {isAr ? "📱 اسحب يميناً ويساراً أو قم بتدوير الهاتف لرؤية الشجرة كاملة" : "📱 Swipe left/right or rotate your phone to view the full bracket"}
-        </p>
-      </div>
-
-      <div className="w-full overflow-x-auto pb-6 custom-scrollbar" dir="ltr">
-        <div className="min-w-[900px] md:min-w-full flex justify-between items-stretch gap-1 sm:gap-2 py-4 sm:py-8 px-2">
+      <div className="w-full overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" dir="ltr">
+        <div className="min-w-[750px] lg:min-w-0 w-full flex justify-between items-stretch gap-1 sm:gap-2 py-4 sm:py-8 px-2">
           
           {/* Left Side */}
           <BracketNode match={m29} side="left" isAr={isAr}>
@@ -201,8 +195,22 @@ export function WorldCupRoadmap() {
           {/* Center Final & 3rd Place */}
           <div className="flex flex-col items-center justify-center z-10 px-1 sm:px-4 gap-4 sm:gap-8">
             <div className="flex flex-col items-center">
-              <div className="rounded-full border-2 border-primary/40 bg-primary/10 shadow-[0_0_30px_hsl(var(--primary)/0.3)] p-2 sm:p-5 mb-1 sm:mb-4">
-                <Trophy className="h-5 w-5 sm:h-12 sm:w-12 text-primary" />
+              <div className="mb-2 sm:mb-4 relative">
+                <div className="absolute inset-0 bg-[#FFD700]/10 blur-2xl rounded-full" />
+                <img 
+                  src="/images/world-cup-trophy.png" 
+                  alt="World Cup" 
+                  className="relative w-16 h-24 sm:w-24 sm:h-36 object-contain drop-shadow-[0_0_15px_rgba(255,215,0,0.4)] transition-transform hover:scale-105" 
+                  onError={(e) => {
+                    // Fallback to neon trophy if image not found
+                    (e.target as HTMLImageElement).style.display = 'none';
+                    const fallback = document.getElementById('trophy-fallback');
+                    if (fallback) fallback.style.display = 'flex';
+                  }}
+                />
+                <div id="trophy-fallback" className="hidden rounded-full border-2 border-primary/40 bg-primary/10 shadow-[0_0_30px_hsl(var(--primary)/0.3)] p-2 sm:p-5">
+                  <Trophy className="h-5 w-5 sm:h-12 sm:w-12 text-primary" />
+                </div>
               </div>
               <h3 className={cn("font-display font-black text-[10px] sm:text-xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-primary mb-1 sm:mb-4", isAr && "font-arabic")}>
                 {isAr ? 'النهائي' : 'FINAL'}
