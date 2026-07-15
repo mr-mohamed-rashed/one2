@@ -198,7 +198,7 @@ export function WorldCupRoadmap() {
               <div className="mb-2 sm:mb-4 relative">
                 <div className="absolute inset-0 bg-[#FFD700]/10 blur-2xl rounded-full" />
                 <img 
-                  src="/images/world-cup-trophy.png" 
+                  src="/images/world-cup-trophy.png?v=2" 
                   alt="World Cup" 
                   className="relative w-16 h-24 sm:w-24 sm:h-36 object-contain drop-shadow-[0_0_15px_rgba(255,215,0,0.4)] transition-transform hover:scale-105" 
                   onError={(e) => {
@@ -272,17 +272,28 @@ function BracketNode({ match, children, side, isAr }: { match: BracketMatch, chi
       <div className="flex flex-col justify-around">
         {children}
       </div>
-      <div className={cn("flex items-center", side === 'right' && "flex-row-reverse")}>
-        {/* Vertical Connector */}
-        <div 
-          className={cn(
-            "w-2 sm:w-4 border-y-2 border-primary/40", 
-            side === 'left' ? 'border-r-2 rounded-r-md' : 'border-l-2 rounded-l-md'
-          )} 
-          style={{ height: '50%' }} 
-        />
-        {/* Horizontal Connector to parent match */}
-        <div className="w-2 sm:w-3 border-b-2 border-primary/40" />
+      <div className="flex items-center">
+        {side === 'left' ? (
+          <>
+            {/* Vertical Connector */}
+            <div 
+              className="w-2 sm:w-4 border-y-2 border-primary/40 border-r-2 rounded-r-md" 
+              style={{ height: '50%' }} 
+            />
+            {/* Horizontal Connector to parent match */}
+            <div className="w-2 sm:w-3 border-b-2 border-primary/40" />
+          </>
+        ) : (
+          <>
+            {/* Horizontal Connector to parent match */}
+            <div className="w-2 sm:w-3 border-b-2 border-primary/40" />
+            {/* Vertical Connector */}
+            <div 
+              className="w-2 sm:w-4 border-y-2 border-primary/40 border-l-2 rounded-l-md" 
+              style={{ height: '50%' }} 
+            />
+          </>
+        )}
       </div>
       <div className="flex items-center py-1 sm:py-2">
         <MatchBox match={match} isAr={isAr} />
