@@ -272,7 +272,7 @@ function BracketNode({ match, children, side, isAr }: { match: BracketMatch, chi
       <div className="flex flex-col justify-around">
         {children}
       </div>
-      <div className="flex items-center">
+      <div className={cn("flex items-center", side === 'right' && "flex-row-reverse")}>
         {/* Vertical Connector */}
         <div 
           className={cn(
