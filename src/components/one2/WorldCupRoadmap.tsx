@@ -195,12 +195,12 @@ export function WorldCupRoadmap() {
           {/* Center Final & 3rd Place */}
           <div className="flex flex-col items-center justify-center z-10 px-1 sm:px-4 gap-4 sm:gap-8">
             <div className="flex flex-col items-center">
-              <div className="mb-0 sm:mb-2 mt-4 sm:mt-8 relative translate-y-2 sm:translate-y-4">
-                <div className="absolute inset-0 bg-[#FFD700]/15 blur-2xl rounded-full" />
+              <div className="mb-2 sm:mb-6 mt-2 sm:mt-6 relative">
+                <div className="absolute inset-0 bg-[#FFD700]/15 blur-3xl rounded-full" />
                 <img 
-                  src="/images/world-cup-trophy.png?v=3" 
+                  src="/images/world-cup-trophy.png?v=4" 
                   alt="World Cup" 
-                  className="relative w-24 h-36 sm:w-36 sm:h-56 object-contain drop-shadow-[0_0_20px_rgba(255,215,0,0.5)] transition-transform hover:scale-105" 
+                  className="relative w-36 h-56 sm:w-56 sm:h-[340px] object-contain drop-shadow-[0_0_25px_rgba(255,215,0,0.6)] transition-transform hover:scale-110" 
                   onError={(e) => {
                     // Fallback to neon trophy if image not found
                     (e.target as HTMLImageElement).style.display = 'none';
