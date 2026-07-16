@@ -193,16 +193,16 @@ export function WorldCupRoadmap() {
           </BracketNode>
 
           {/* Center Final & 3rd Place */}
-          <div className="flex flex-col items-center justify-center z-10 px-1 sm:px-4 gap-4 sm:gap-8">
-            <div className="flex flex-col items-center w-full">
-              
-              {/* Giant Trophy */}
-              <div className="mb-4 sm:mb-8 w-full flex justify-center relative">
+          <div className="flex flex-col items-center justify-center z-10 px-1 sm:px-4 gap-4 sm:gap-8 relative">
+            
+            {/* Giant Trophy Positioned Absolutely Above */}
+            <div className="absolute bottom-[calc(100%-1rem)] sm:bottom-full sm:mb-2 w-full flex justify-center pointer-events-none z-20">
+              <div className="relative flex justify-center items-end">
                 <div className="absolute inset-0 bg-[#FFD700]/15 blur-3xl rounded-full" />
                 <img 
-                  src="/images/world-cup-trophy.png?v=6" 
+                  src="/images/world-cup-trophy.png?v=7" 
                   alt="World Cup" 
-                  className="relative w-48 h-[250px] sm:w-[350px] sm:h-[450px] object-contain drop-shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-transform hover:scale-110" 
+                  className="relative w-[250px] sm:w-[450px] object-contain drop-shadow-[0_0_40px_rgba(255,215,0,0.8)] pointer-events-auto transition-transform scale-125 sm:scale-150 hover:scale-150 sm:hover:scale-[1.6]" 
                   onError={(e) => {
                     // Fallback to neon trophy if image not found
                     (e.target as HTMLImageElement).style.display = 'none';
@@ -214,11 +214,13 @@ export function WorldCupRoadmap() {
                 {/* Fallback Neon Trophy */}
                 <div id="trophy-fallback" className="hidden relative p-4 sm:p-8 bg-background/80 rounded-full border border-primary/20 shadow-[0_0_30px_rgba(var(--primary),0.3)]">
                   <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
-                  <Trophy className="w-16 h-16 sm:w-32 sm:h-32 text-primary relative z-10" />
+                  <Trophy className="w-24 h-24 sm:w-40 sm:h-40 text-primary relative z-10" />
                 </div>
               </div>
+            </div>
 
-              <h3 className={cn("font-display font-black text-[10px] sm:text-xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-primary mb-1 sm:mb-4", isAr && "font-arabic")}>
+            <div className="flex flex-col items-center w-full mt-8 sm:mt-12">
+              <h3 className={cn("font-display font-black text-[12px] sm:text-2xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-primary mb-2 sm:mb-4", isAr && "font-arabic")}>
                 {isAr ? 'النهائي' : 'FINAL'}
               </h3>
               <MatchBox match={final} isAr={isAr} isFinal />
