@@ -166,7 +166,7 @@ export function WorldCupRoadmap() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,hsl(var(--primary)/0.15),transparent_40%)] pointer-events-none" />
       
       <div className="w-full overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" dir="ltr">
-        <div className="min-w-[750px] lg:min-w-0 w-full flex justify-between items-stretch gap-1 sm:gap-2 py-4 sm:py-8 pt-24 sm:pt-48 px-2">
+        <div className="min-w-[750px] lg:min-w-0 w-full flex justify-between items-stretch gap-1 sm:gap-2 py-4 sm:py-8 px-2">
           
           {/* Left Side */}
           <BracketNode match={m29} side="left" isAr={isAr}>
@@ -193,16 +193,16 @@ export function WorldCupRoadmap() {
           </BracketNode>
 
           {/* Center Final & 3rd Place */}
-          <div className="flex flex-col items-center justify-center z-10 px-1 sm:px-4 gap-4 sm:gap-8 relative">
-            
-            {/* Giant Trophy Positioned Absolutely Above */}
-            <div className="absolute bottom-full mb-4 sm:mb-8 w-full flex justify-center pointer-events-none">
-              <div className="relative flex justify-center items-end">
+          <div className="flex flex-col items-center justify-center z-10 px-1 sm:px-4 gap-4 sm:gap-8">
+            <div className="flex flex-col items-center w-full">
+              
+              {/* Giant Trophy */}
+              <div className="mb-4 sm:mb-8 w-full flex justify-center relative">
                 <div className="absolute inset-0 bg-[#FFD700]/15 blur-3xl rounded-full" />
                 <img 
-                  src="/images/world-cup-trophy.png?v=5" 
+                  src="/images/world-cup-trophy.png?v=6" 
                   alt="World Cup" 
-                  className="relative w-48 h-[250px] sm:w-[350px] sm:h-[450px] object-contain drop-shadow-[0_0_30px_rgba(255,215,0,0.6)] pointer-events-auto transition-transform hover:scale-110" 
+                  className="relative w-48 h-[250px] sm:w-[350px] sm:h-[450px] object-contain drop-shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-transform hover:scale-110" 
                   onError={(e) => {
                     // Fallback to neon trophy if image not found
                     (e.target as HTMLImageElement).style.display = 'none';
@@ -217,9 +217,7 @@ export function WorldCupRoadmap() {
                   <Trophy className="w-16 h-16 sm:w-32 sm:h-32 text-primary relative z-10" />
                 </div>
               </div>
-            </div>
 
-            <div className="flex flex-col items-center">
               <h3 className={cn("font-display font-black text-[10px] sm:text-xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-primary mb-1 sm:mb-4", isAr && "font-arabic")}>
                 {isAr ? 'النهائي' : 'FINAL'}
               </h3>
