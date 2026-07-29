@@ -18,12 +18,13 @@ export function Navigation() {
   const { data: liveMatches = [] } = useLiveFixtures();
 
   const links = [
-    { nameKey: 'home' as const,         to: '/' },
-    { nameKey: 'worldCupNews' as const,  to: '/news' },
-    { nameKey: 'groups' as const,        to: '/groups' },
-    { nameKey: 'roadmap' as const,       to: '/roadmap' },
-    { nameKey: 'standings' as const,     to: '/standings' },
-    { nameKey: 'liveMatches' as const,   to: '/live' },
+    { nameKey: 'home' as const,             to: '/' },
+    { nameKey: 'worldCupArchive' as const,  to: '/world-cup' },
+    { nameKey: 'worldCupNews' as const,     to: '/news' },
+    { nameKey: 'groups' as const,           to: '/groups' },
+    { nameKey: 'roadmap' as const,          to: '/roadmap' },
+    { nameKey: 'standings' as const,        to: '/standings' },
+    { nameKey: 'liveMatches' as const,      to: '/live' },
   ];
 
   return (

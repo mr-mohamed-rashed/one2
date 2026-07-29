@@ -7,6 +7,7 @@ export type Lang = 'en' | 'ar';
 
 const T = {
   home: { en: 'Home', ar: 'الرئيسية' },
+  worldCupArchive: { en: 'World Cup 2026', ar: 'كأس العالم 2026' },
   worldCupNews: { en: 'World Cup News', ar: 'أخبار كأس العالم' },
   standings: { en: 'Golden Boot', ar: 'الحذاء الذهبي' },
   liveMatches: { en: 'Live Matches', ar: 'المباريات المباشرة' },
