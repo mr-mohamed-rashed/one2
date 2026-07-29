@@ -13,6 +13,8 @@ const T = {
   liveMatches: { en: 'Live Matches', ar: 'المباريات المباشرة' },
   groups: { en: 'Groups', ar: 'المجموعات' },
   roadmap: { en: 'Road to the Cup', ar: 'طريق الكأس' },
+  leagues: { en: 'Leagues', ar: 'الدوريات' },
+  transfers: { en: 'Transfers', ar: 'الانتقالات' },
 
   theBeautifulGame: { en: 'The Beautiful Game.', ar: 'اللعبة الجميلة.' },
   live: { en: 'Live.', ar: 'مباشر.' },

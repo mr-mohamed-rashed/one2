@@ -19,11 +19,8 @@ export function Navigation() {
 
   const links = [
     { nameKey: 'home' as const,             to: '/' },
-    { nameKey: 'worldCupArchive' as const,  to: '/world-cup' },
-    { nameKey: 'worldCupNews' as const,     to: '/news' },
-    { nameKey: 'groups' as const,           to: '/groups' },
-    { nameKey: 'roadmap' as const,          to: '/roadmap' },
-    { nameKey: 'standings' as const,        to: '/standings' },
+    { nameKey: 'leagues' as const,          to: '/#leagues' },
+    { nameKey: 'transfers' as const,        to: '/transfers' },
     { nameKey: 'liveMatches' as const,      to: '/live' },
   ];
 
