@@ -82,26 +82,29 @@ export function WorldCupRoadmap() {
     for (let iteration = 0; iteration < 5; iteration++) {
       let iterationChanged = false;
       
+      // Map finished matches to bracket
       for (const [id, match] of Object.entries(newState.matches)) {
-        if (match.team1Id && match.team2Id) {
-          const finishedMatch = finishedMatches.find(m => 
-            (m.home.id === match.team1Id && m.away.id === match.team2Id) ||
-            (m.home.id === match.team2Id && m.away.id === match.team1Id)
-          );
-
-          if (finishedMatch) {
-            const isT1Home = finishedMatch.home.id === match.team1Id;
-            const score1 = isT1Home ? finishedMatch.homeScore : finishedMatch.awayScore;
-            const score2 = isT1Home ? finishedMatch.awayScore : finishedMatch.homeScore;
-            
-            match.score1 = score1;
-            match.score2 = score2;
-            
-            const winnerId = finishedMatch.winnerId;
-            if (winnerId && match.winnerId !== winnerId) {
-              newState = advanceTeam(newState, id, winnerId);
-              iterationChanged = true;
-            }
+        // Find if this match has finished in footballData
+        const finishedMatch = finishedMatches.find(m => 
+          (m.home?.id === match.team1Id && m.away?.id === match.team2Id) ||
+          (m.home?.id === match.team2Id && m.away?.id === match.team1Id)
+        );
+        
+        if (finishedMatch) {
+          const isT1Home = finishedMatch.home?.id === match.team1Id;
+          const score1 = isT1Home ? finishedMatch.homeScore : finishedMatch.awayScore;
+          const score2 = isT1Home ? finishedMatch.awayScore : finishedMatch.homeScore;
+          
+          if (match.score1 !== score1 || match.score2 !== score2) {
+             match.score1 = score1;
+             match.score2 = score2;
+             // Ensure scores update without triggering an infinite structural loop
+          }
+          
+          const winnerId = finishedMatch.winnerId;
+          if (winnerId && match.winnerId !== winnerId) {
+            newState = advanceTeam(newState, id, winnerId);
+            iterationChanged = true;
           }
         }
       }
@@ -197,10 +200,14 @@ export function WorldCupRoadmap() {
             
             {/* Giant Trophy Positioned Absolutely Above */}
             <div className="absolute bottom-[calc(100%-1rem)] sm:bottom-full sm:mb-2 w-full flex justify-center pointer-events-none z-20">
-              <div className="relative flex justify-center items-end">
-                <div className="absolute inset-0 bg-[#FFD700]/15 blur-3xl rounded-full" />
+              <div className="relative flex justify-center items-end translate-y-16 sm:translate-y-28">
+                {/* Spain Flag Behind the Trophy */}
+                <div 
+                  className="absolute inset-0 blur-3xl opacity-60 rounded-full bg-cover bg-center" 
+                  style={{ backgroundImage: `url(${teamsData.ESP.flag})` }}
+                />
                 <img 
-                  src="/images/world-cup-trophy.png?v=7" 
+                  src="/images/world-cup-trophy.png?v=8" 
                   alt="World Cup" 
                   className="relative w-[250px] sm:w-[450px] object-contain drop-shadow-[0_0_40px_rgba(255,215,0,0.8)] pointer-events-auto transition-transform scale-125 sm:scale-150 hover:scale-150 sm:hover:scale-[1.6]" 
                   onError={(e) => {
@@ -213,7 +220,7 @@ export function WorldCupRoadmap() {
                 
                 {/* Fallback Neon Trophy */}
                 <div id="trophy-fallback" className="hidden relative p-4 sm:p-8 bg-background/80 rounded-full border border-primary/20 shadow-[0_0_30px_rgba(var(--primary),0.3)]">
-                  <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
+                  <div className="absolute inset-0 rounded-full opacity-60 blur-xl animate-pulse bg-cover bg-center" style={{ backgroundImage: `url(${teamsData.ESP.flag})` }} />
                   <Trophy className="w-24 h-24 sm:w-40 sm:h-40 text-primary relative z-10" />
                 </div>
               </div>
