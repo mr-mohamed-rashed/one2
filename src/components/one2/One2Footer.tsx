@@ -163,11 +163,21 @@ export function One2Footer() {
             </div>
           </div>
           
-          {/* Big Centered ONE2 text */}
+          {/* Big Centered ONE2 text/logo */}
           <div className={`w-full flex justify-center py-12 transition-all duration-1000 delay-300 relative z-10 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-            <div className="relative group hover:scale-105 transition-transform duration-500">
+            <div className="relative group hover:scale-105 transition-transform duration-500 w-full max-w-4xl h-40 sm:h-64 flex items-center justify-center">
+              <img 
+                src="/images/one2-wings-logo.png" 
+                alt="One2 Logo" 
+                className="w-auto h-full max-w-full object-contain drop-shadow-[0_0_50px_rgba(34,197,94,0.3)]"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  document.getElementById('footer-logo-fallback')!.style.display = 'block';
+                }}
+              />
               <span 
-                className="font-display font-black text-7xl sm:text-8xl md:text-[140px] tracking-tighter select-none leading-none relative z-10 block"
+                id="footer-logo-fallback"
+                className="hidden font-display font-black text-7xl sm:text-8xl md:text-[140px] tracking-tighter select-none leading-none relative z-10"
                 style={{
                   background: 'repeating-linear-gradient(45deg, #4ade80, #4ade80 20px, #22c55e 20px, #22c55e 40px)',
                   WebkitBackgroundClip: 'text',

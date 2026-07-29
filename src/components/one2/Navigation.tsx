@@ -30,9 +30,19 @@ export function Navigation() {
         <div className="flex items-center justify-between h-16">
           {/* Brand */}
           <NavLink to="/" className="flex items-center group shrink-0">
-            <div dir="ltr" className="flex items-baseline font-display font-black tracking-tighter select-none">
+            <div dir="ltr" className="flex items-center h-10 w-auto">
+              <img 
+                src="/images/one2-wings-logo.png" 
+                alt="One2 Logo" 
+                className="h-full w-auto object-contain drop-shadow-md"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  document.getElementById('nav-logo-fallback')!.style.display = 'block';
+                }}
+              />
               <span 
-                className="text-primary text-3xl tracking-tight" 
+                id="nav-logo-fallback"
+                className="hidden text-primary text-3xl font-black tracking-tight" 
                 style={{ 
                   textShadow: '0 1px 0 hsl(145, 70%, 25%), 0 2px 0 hsl(145, 70%, 20%), 0 3px 0 hsl(145, 70%, 15%), 0 4px 0 hsl(145, 70%, 10%), 0 0 15px rgba(34,197,94,0.6), 0 0 30px rgba(34,197,94,0.4)' 
                 }}
