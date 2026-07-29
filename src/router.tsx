@@ -3,6 +3,7 @@ import { Outlet, useLocation, ScrollRestoration } from 'react-router-dom';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useAuth } from './hooks/useAuth';
 import Index from './pages/Index';
+import LeagueHome from './pages/LeagueHome';
 import WorldCupArchive from './pages/WorldCupArchive';
 import NotFound from './pages/NotFound';
 import WorldCupNews from './pages/WorldCupNews';
@@ -64,6 +65,7 @@ export const routers = [
     element: <Layout />,
     children: [
       { path: '/', name: 'home', element: <Index /> },
+      { path: '/league/:leagueId', name: 'league', element: <LeagueHome /> },
       { path: '/world-cup', name: 'worldCup', element: <WorldCupArchive /> },
       { path: '/news', name: 'news', element: <WorldCupNews /> },
       { path: '/news/sports/:postId', name: 'newsArticle', element: <NewsArticle /> },
