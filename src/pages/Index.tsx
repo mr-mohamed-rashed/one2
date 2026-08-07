@@ -2,6 +2,8 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Navigation } from '@/components/one2/Navigation';
 import { One2Footer } from '@/components/one2/One2Footer';
+import { SponsorMarquee } from '@/components/one2/SponsorMarquee';
+import { LiveMatchesRow } from '@/components/one2/LiveMatchesRow';
 import { useLanguage } from '@/context/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Trophy } from 'lucide-react';
@@ -69,7 +71,7 @@ const Index = () => {
       <section className="relative w-full h-[350px] sm:h-[450px] flex flex-col items-center justify-center overflow-hidden border-b-2 border-primary/20">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60"
-          style={{ backgroundImage: "url('/images/stadium-lights-bg.jpg')" }} 
+          style={{ backgroundImage: "url('/images/stadium-lights-bg.png')" }} 
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0f18]/30 via-[#0a0f18]/60 to-[#0a0f18]" />
         
@@ -96,6 +98,10 @@ const Index = () => {
           </h2>
         </div>
       </section>
+
+      <SponsorMarquee />
+
+      <LiveMatchesRow />
 
       {/* Grid Section */}
       <section id="leagues" className="container mx-auto px-4 py-12 sm:py-16 relative z-10">

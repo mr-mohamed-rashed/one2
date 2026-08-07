@@ -167,6 +167,41 @@ export function useLiveFixtures() {
   });
 }
 
+// ---------- Live matches across all leagues (API-Football) ----------
+export function useAllLiveFixtures() {
+  return useQuery({
+    queryKey: ['all-live-fixtures'],
+    queryFn: async () => {
+      try {
+        const response = await fetch('https://v3.football.api-sports.io/fixtures?live=all', {
+          method: 'GET',
+          headers: {
+            'x-rapidapi-host': 'v3.football.api-sports.io',
+            'x-rapidapi-key': '19a3b0d1fe31969b6b6e615f1c38fccd'
+          }
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        
+        if (data.errors && Object.keys(data.errors).length > 0) {
+          console.error('[API-Football] errors:', data.errors);
+          return [];
+        }
+
+        let results: Match[] = [];
+        if (data?.response?.length) {
+          results = data.response.map(mapFixture);
+        }
+        return results;
+      } catch (err) {
+        console.error('[API-Football] useAllLiveFixtures error:', err);
+        return [];
+      }
+    },
+    refetchInterval: 60_000, // Refetch live scores every 1 minute
+  });
+}
+
 // ---------- Upcoming fixtures ----------
 export function useUpcomingFixtures() {
   return useQuery({
