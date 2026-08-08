@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import type { ReactNode } from 'react';
-import { Check, Eye, EyeOff, FileText, Loader2, Newspaper, Plus, Save, Trash2, Zap, ArrowUp, ArrowDown, Edit, Bot } from 'lucide-react';
+import { Check, Eye, EyeOff, FileText, Loader2, Newspaper, Plus, Save, Trash2, Zap, ArrowUp, ArrowDown, Edit, Bot, Radio } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useManualNews, type ManualNewsRow, isSystemCategory, getNewsType, getNewsCategoryName, makeCategoryString } from '@/hooks/useManualNews';
 import { useNewsCategories } from '@/hooks/useNewsCategories';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { toast } from '@/hooks/use-toast';
 
 type NewsDraft = Omit<ManualNewsRow, 'id' | 'created_at'>;
 
@@ -74,6 +75,141 @@ export function NewsTab() {
   const [pulse, setPulse] = useState(blankPulse());
   const [article, setArticle] = useState(blankArticle());
   const [botMessage, setBotMessage] = useState(blankBotMessage());
+
+  const [importing, setImporting] = useState(false);
+  const [importLog, setImportLog] = useState<string[]>([]);
+
+  const handleAutoImport = async () => {
+    setImporting(true);
+    setImportLog([
+      'بدء الاتصال بمصادر الأخبار...',
+    ]);
+    
+    try {
+      // Fetch news from Youm7 Sports RSS via rss2json
+      const response = await fetch(
+        `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(
+          'https://www.youm7.com/rss/Section?SectionID=298'
+        )}`
+      );
+      
+      if (!response.ok) {
+        throw new Error('فشل جلب الأخبار من المصدر.');
+      }
+      
+      const data = await response.json();
+      
+      if (!data?.items || data.items.length === 0) {
+        setImportLog((prev) => [...prev, '⚠️ لا توجد أخبار جديدة حالياً في المصدر.']);
+        setImporting(false);
+        return;
+      }
+      
+      setImportLog((prev) => [
+        ...prev,
+        `تم العثور على ${data.items.length} خبر في المصدر. جاري تحليل الكلمات والتصنيف...`,
+      ]);
+
+      let importedCount = 0;
+      let skippedCount = 0;
+      
+      for (const item of data.items) {
+        const titleAr = item.title || '';
+        const descAr = item.description || '';
+        const imageUrl = item.thumbnail || item.enclosure?.link || '';
+        
+        // Skip duplicate check
+        const isDuplicate = news.some((existing) => existing.title_ar === titleAr);
+        if (isDuplicate) {
+          skippedCount++;
+          continue;
+        }
+
+        // Tagging AI logic based on Arabic keyword match
+        let category = 'News 2026'; // default general
+        const titleLower = titleAr.toLowerCase();
+        const descLower = descAr.toLowerCase();
+        
+        if (
+          titleLower.includes('إنجلترا') || titleLower.includes('الإنجليزي') || titleLower.includes('ليفربول') || titleLower.includes('مانشستر') || titleLower.includes('أرسنال') || titleLower.includes('تشيلسي') || titleLower.includes('صلاح') || titleLower.includes('جوارديولا') || titleLower.includes('بريميرليج') ||
+          descLower.includes('إنجلترا') || descLower.includes('الإنجليزي') || descLower.includes('ليفربول') || descLower.includes('مانشستر')
+        ) {
+          category = 'epl';
+        } else if (
+          titleLower.includes('إسبانيا') || titleLower.includes('الإسباني') || titleLower.includes('برشلونة') || titleLower.includes('مدريد') || titleLower.includes('ريال') || titleLower.includes('لاليغا') ||
+          descLower.includes('إسبانيا') || descLower.includes('الإسباني') || descLower.includes('برشلونة') || descLower.includes('مدريد')
+        ) {
+          category = 'laliga';
+        } else if (
+          titleLower.includes('إيطاليا') || titleLower.includes('الإيطالي') || titleLower.includes('ميلان') || titleLower.includes('يوفنتوس') || titleLower.includes('إنتر') ||
+          descLower.includes('إيطاليا') || descLower.includes('الإيطالي') || descLower.includes('ميلان') || descLower.includes('يوفنتوس')
+        ) {
+          category = 'seriea';
+        } else if (
+          titleLower.includes('ألمانيا') || titleLower.includes('الألماني') || titleLower.includes('بايرن') || titleLower.includes('دورتموند') ||
+          descLower.includes('ألمانيا') || descLower.includes('الألماني') || descLower.includes('بايرن') || descLower.includes('دورتموند')
+        ) {
+          category = 'bundesliga';
+        } else if (
+          titleLower.includes('فرنسا') || titleLower.includes('الفرنسي') || titleLower.includes('باريس') || titleLower.includes('مبابي') ||
+          descLower.includes('فرنسا') || descLower.includes('الفرنسي') || descLower.includes('باريس') || descLower.includes('مبابي')
+        ) {
+          category = 'ligue1';
+        } else if (
+          titleLower.includes('دوري أبطال') || titleLower.includes('أبطال أوروبا') || titleLower.includes('تشامبيونزليج') ||
+          descLower.includes('دوري أبطال') || descLower.includes('أبطال أوروبا')
+        ) {
+          category = 'ucl';
+        } else if (
+          titleLower.includes('الأهلي') || titleLower.includes('الزمالك') || titleLower.includes('بيراميدز') || titleLower.includes('الدوري المصري') || titleLower.includes('مصر') ||
+          descLower.includes('الأهلي') || descLower.includes('الزمالك') || descLower.includes('الدوري المصري') || descLower.includes('مصر')
+        ) {
+          category = 'epl_egypt';
+        }
+
+        const cleanDescAr = descAr.replace(/<[^>]*>/g, '').trim().slice(0, 200);
+
+        await save({
+          title_ar: titleAr,
+          title_en: titleAr,
+          excerpt_ar: cleanDescAr || titleAr,
+          excerpt_en: cleanDescAr || titleAr,
+          category: category,
+          image_url: imageUrl,
+          published_at: item.pubDate ? item.pubDate.slice(0, 10) : today(),
+          is_published: true,
+        });
+
+        const leagueLabel = getNewsCategoryName(category);
+        setImportLog((prev) => [
+          ...prev,
+          `✅ تم استيراد: "${titleAr.slice(0, 30)}..." وربطه بـ [${leagueLabel}]`,
+        ]);
+        
+        importedCount++;
+      }
+      
+      setImportLog((prev) => [
+        ...prev,
+        `🎉 اكتمال العملية بنجاح! تم استيراد ${importedCount} خبر جديد، وتخطي ${skippedCount} خبر مكرر.`,
+      ]);
+      
+      toast({
+        title: 'تم الاستيراد بنجاح',
+        description: `تمت إضافة ${importedCount} خبر جديد وتحديث الموقع.`,
+      });
+    } catch (error) {
+      console.error('Auto import failed:', error);
+      setImportLog((prev) => [...prev, '❌ حدث خطأ أثناء الاتصال بمصادر الأخبار.']);
+      toast({
+        title: 'خطأ في الاستيراد',
+        description: 'تأكد من اتصالك بالإنترنت وحاول مجدداً.',
+        variant: 'destructive',
+      });
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const tickerItems = news.filter((item) => getNewsType(item.category) === 'Ticker');
   const pulseItems = news.filter((item) => getNewsType(item.category) === 'Pulse');
@@ -162,7 +298,7 @@ export function NewsTab() {
         setArticle(blankArticle());
         setBotMessage(blankBotMessage());
       }}>
-        <TabsList className="grid h-auto grid-cols-1 gap-2 bg-card p-1 sm:grid-cols-4">
+        <TabsList className="grid h-auto grid-cols-1 gap-2 bg-card p-1 sm:grid-cols-5">
           <TabsTrigger value="ticker" className="gap-2 py-3">
             <Zap className="h-4 w-4" />
             الشريط
@@ -178,6 +314,10 @@ export function NewsTab() {
           <TabsTrigger value="bots" className="gap-2 py-3">
             <Bot className="h-4 w-4" />
             رسائل البوت
+          </TabsTrigger>
+          <TabsTrigger value="auto-import" className="gap-2 py-3 text-primary border border-primary/20 hover:bg-primary/5">
+            <Radio className="h-4 w-4 animate-pulse" />
+            سحب الأخبار تلقائياً
           </TabsTrigger>
         </TabsList>
 
@@ -440,6 +580,63 @@ export function NewsTab() {
             </div>
           </Card>
           <NewsList items={botMessageItems} empty="لا توجد رسائل للروبوتات حتى الآن." onRemove={remove} onToggle={togglePublish} onReorder={reorder} onEdit={(item) => handleEdit(item, setBotMessage)} />
+        </TabsContent>
+
+        <TabsContent value="auto-import" className="space-y-4">
+          <Card className="border-primary/25 bg-gradient-card p-5">
+            <SectionTitle
+              title="سحب الأخبار تلقائياً"
+              description="سحب وجلب أحدث الأخبار الرياضية العربية من مصادر موثوقة (اليوم السابع)، وتصنيفها أوتوماتيكياً لكل دوري بناءً على الكلمات المفتاحية."
+            />
+            
+            <div className="mt-6 space-y-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                <Button 
+                  onClick={handleAutoImport} 
+                  disabled={importing} 
+                  className="h-12 bg-primary text-primary-foreground hover:bg-primary-glow font-bold shadow-neon gap-2"
+                >
+                  {importing ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      جاري سحب وتصنيف الأخبار...
+                    </>
+                  ) : (
+                    <>
+                      <Radio className="h-5 w-5 animate-pulse" />
+                      بدء السحب والتصنيف التلقائي
+                    </>
+                  )}
+                </Button>
+                
+                <span className="text-xs text-muted-foreground font-arabic">
+                  * يقوم النظام بالتحقق تلقائياً من الأخبار المكررة لعدم استيرادها مرتين.
+                </span>
+              </div>
+
+              {importLog.length > 0 && (
+                <div className="mt-4 rounded-xl border border-white/10 bg-black/60 p-4 font-mono text-xs text-start space-y-2 h-64 overflow-y-auto">
+                  <div className="text-muted-foreground border-b border-white/5 pb-2 font-arabic font-bold text-sm">
+                    سجل عملية الاستيراد:
+                  </div>
+                  {importLog.map((log, idx) => (
+                    <div 
+                      key={idx} 
+                      className={cn(
+                        "leading-relaxed font-arabic",
+                        log.startsWith('✅') && "text-green-400 font-semibold",
+                        log.startsWith('❌') && "text-red-400 font-semibold",
+                        log.startsWith('⚠️') && "text-yellow-400 font-semibold",
+                        log.startsWith('🎉') && "text-primary text-sm font-extrabold mt-2"
+                      )}
+                    >
+                      {log}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
