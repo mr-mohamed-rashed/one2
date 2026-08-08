@@ -151,6 +151,69 @@ const LeagueHome = () => {
           </section>
         )}
 
+        {/* Latest 3 News Cards Section */}
+        <section id="trending-news">
+          <div className="rounded-xl overflow-hidden shadow-2xl backdrop-blur-sm border border-white/10" style={{ backgroundColor: `${league.colors.primary}40` }}>
+            <div className="px-6 py-4 flex items-center justify-between border-b border-white/10" style={{ backgroundColor: `${league.colors.primary}80` }}>
+              <div className="flex items-center gap-3">
+                <div style={{ color: league.colors.accent }}>
+                  <Newspaper className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className={cn('text-xl font-bold', isAr && 'font-arabic')}>
+                    {isAr ? 'آخر أخبار الدوري الممتازة' : 'Featured League News'}
+                  </h3>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-4 p-6 md:grid-cols-3">
+              {leagueNews.slice(0, 3).length > 0 ? (
+                leagueNews.slice(0, 3).map((item) => {
+                  const title = isAr ? item.title_ar || item.title_en : item.title_en || item.title_ar;
+                  const excerpt = isAr ? item.excerpt_ar || item.excerpt_en : item.excerpt_en || item.excerpt_ar;
+                  const urlId = item.post_id || item.id;
+                  
+                  return (
+                    <NavLink 
+                      key={item.id} 
+                      to={`/news/sports/${urlId}`} 
+                      className="group overflow-hidden rounded-lg border border-white/10 bg-black/45 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 block hover:shadow-2xl"
+                    >
+                      <div className="relative aspect-[16/10] overflow-hidden bg-black/40">
+                        <img
+                          src={item.image_url || 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=800&q=80'}
+                          alt={title}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=800&q=80';
+                          }}
+                        />
+                        <span className="absolute right-2 top-2 px-2 py-0.5 rounded text-[9px] font-bold border" style={{ backgroundColor: `${league.colors.accent}d0`, color: '#000', borderColor: league.colors.accent }}>
+                          {isAr ? 'خبر عاجل' : 'BREAKING'}
+                        </span>
+                      </div>
+                      <div className="p-4 space-y-2">
+                        <h4 className={cn('line-clamp-2 text-sm font-bold leading-relaxed text-white group-hover:text-primary-glow transition-colors text-start', isAr && 'font-arabic')}>
+                          {title}
+                        </h4>
+                        <p className={cn('line-clamp-2 text-xs text-white/60 leading-relaxed text-start', isAr && 'font-arabic')}>
+                          {excerpt}
+                        </p>
+                        <p className="text-[10px] text-white/40 text-start" dir="ltr">{item.published_at}</p>
+                      </div>
+                    </NavLink>
+                  );
+                })
+              ) : (
+                <div className="col-span-full h-48 flex items-center justify-center text-white/50 border border-dashed border-white/20 rounded-lg">
+                  {isAr ? 'لا توجد أخبار مضافة حالياً لهذا الدوري' : 'No news articles available for this league yet'}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
         {/* Split Grid */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
