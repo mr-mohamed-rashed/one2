@@ -1,6 +1,8 @@
 import React from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { Navigation } from '@/components/one2/Navigation';
+import { NewsTicker } from '@/components/one2/NewsTicker';
+import { SponsorMarquee } from '@/components/one2/SponsorMarquee';
 import { One2Footer } from '@/components/one2/One2Footer';
 import { useLanguage } from '@/context/LanguageContext';
 import { leaguesConfig } from '@/lib/leaguesConfig';
@@ -44,6 +46,9 @@ const LeagueHome = () => {
       style={{ backgroundColor: league.colors.background }}
     >
       <Navigation />
+      
+      {/* News Ticker */}
+      <NewsTicker />
 
       {/* Dynamic Themed Hero Section */}
       <section 
@@ -109,117 +114,132 @@ const LeagueHome = () => {
         </div>
       </section>
 
-      {/* Main Content Grid */}
-      <section className="container mx-auto px-4 py-12 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Main Content Column */}
-          <div className="lg:col-span-2 space-y-8">
+      {/* Sponsor Marquee */}
+      <SponsorMarquee />
+
+      {/* Main Content Body */}
+      <main className="container mx-auto px-4 py-12 relative z-10 space-y-12">
+        
+        {/* Full-width Match Center on Top */}
+        {league.apiLeagueId ? (
+          <section id="match-center">
             <ContentCard 
-              title={isAr ? 'آخر الأخبار' : 'Latest News'} 
-              icon={<Newspaper />} 
+              title={isAr ? 'مركز مباريات الدوري' : 'League Match Center'} 
+              icon={<Calendar className="h-5 w-5" />} 
               primaryColor={league.colors.primary}
               accentColor={league.colors.accent}
             >
-              <div className="space-y-4">
-                {leagueNews.length > 0 ? (
-                  leagueNews.map((n) => (
-                    <div 
-                      key={n.id} 
-                      className="block p-5 rounded-xl border border-white/10 bg-black/30 hover:border-white/20 transition-all duration-300 group hover:shadow-lg"
-                    >
-                      <span className="inline-block px-2.5 py-1 rounded text-[10px] font-bold mb-3 border" style={{ backgroundColor: `${league.colors.accent}15`, color: league.colors.accent, borderColor: `${league.colors.accent}30` }}>
-                        {isAr ? 'أخبار الدوري' : 'LEAGUE NEWS'}
-                      </span>
-                      <h3 className={cn('text-base sm:text-lg font-bold transition-colors leading-relaxed text-start text-white group-hover:text-primary-glow', isAr && 'font-arabic')}>
-                        {isAr ? n.title_ar || n.title_en : n.title_en || n.title_ar}
-                      </h3>
-                      <p className={cn('text-sm text-white/60 mt-2 leading-relaxed text-start', isAr && 'font-arabic')}>
-                        {isAr ? n.excerpt_ar || n.excerpt_en : n.excerpt_en || n.excerpt_ar}
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <div className="h-48 flex items-center justify-center text-white/50 border border-dashed border-white/20 rounded-lg">
-                    {isAr ? 'لا توجد أخبار مضافة حالياً لهذا الدوري' : 'No news articles available for this league yet'}
-                  </div>
-                )}
+              <LeagueMatchCenter 
+                leagueId={league.apiLeagueId} 
+                season={league.season || 2026} 
+                accentColor={league.colors.accent} 
+              />
+            </ContentCard>
+          </section>
+        ) : (
+          <section id="match-center">
+            <ContentCard 
+              title={isAr ? 'مركز المباريات' : 'Match Center'} 
+              icon={<Calendar className="h-5 w-5" />} 
+              primaryColor={league.colors.primary}
+              accentColor={league.colors.accent}
+            >
+              <div className="h-48 flex items-center justify-center text-white/50 border border-dashed border-white/20 rounded-lg">
+                {isAr ? 'سيتم إضافة جدول المباريات قريباً' : 'Fixtures integration coming soon'}
               </div>
             </ContentCard>
+          </section>
+        )}
 
+        {/* Split Grid */}
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Main Column (2/3) - Standings & Top Scorers */}
+          <div className="lg:col-span-2 space-y-8">
             {league.apiLeagueId ? (
-              <ContentCard 
-                title={isAr ? 'مركز المباريات والنتائج' : 'Match Center & Results'} 
-                icon={<Calendar />} 
-                primaryColor={league.colors.primary}
-                accentColor={league.colors.accent}
-              >
-                <LeagueMatchCenter 
-                  leagueId={league.apiLeagueId} 
-                  season={league.season || 2026} 
-                  accentColor={league.colors.accent} 
-                />
-              </ContentCard>
+              <section id="standings">
+                <ContentCard 
+                  title={isAr ? 'جدول ترتيب الدوري' : 'League Standings'} 
+                  icon={<BarChart3 className="h-5 w-5" />} 
+                  primaryColor={league.colors.primary}
+                  accentColor={league.colors.accent}
+                >
+                  <LeagueStandingsTable 
+                    leagueId={league.apiLeagueId} 
+                    season={league.season || 2026} 
+                    accentColor={league.colors.accent} 
+                  />
+                </ContentCard>
+              </section>
             ) : (
-              <ContentCard 
-                title={isAr ? 'المباريات والنتائج' : 'Matches & Results'} 
-                icon={<Calendar />} 
-                primaryColor={league.colors.primary}
-                accentColor={league.colors.accent}
-              >
-                <div className="h-48 flex items-center justify-center text-white/50 border border-dashed border-white/20 rounded-lg">
-                  {isAr ? 'سيتم إضافة جدول المباريات قريباً' : 'Fixtures integration coming soon'}
-                </div>
-              </ContentCard>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-8">
-            {league.apiLeagueId ? (
-              <ContentCard 
-                title={isAr ? 'جدول الترتيب' : 'League Standings'} 
-                icon={<BarChart3 />} 
-                primaryColor={league.colors.primary}
-                accentColor={league.colors.accent}
-              >
-                <LeagueStandingsTable 
-                  leagueId={league.apiLeagueId} 
-                  season={league.season || 2026} 
-                  accentColor={league.colors.accent} 
-                />
-              </ContentCard>
-            ) : (
-              <ContentCard 
-                title={isAr ? 'الترتيب' : 'Standings'} 
-                icon={<BarChart3 />} 
-                primaryColor={league.colors.primary}
-                accentColor={league.colors.accent}
-              >
-                <div className="h-96 flex items-center justify-center text-white/50 border border-dashed border-white/20 rounded-lg">
-                  {isAr ? 'سيتم إضافة جدول الترتيب قريباً' : 'Standings table coming soon'}
-                </div>
-              </ContentCard>
+              <section id="standings">
+                <ContentCard 
+                  title={isAr ? 'الترتيب' : 'Standings'} 
+                  icon={<BarChart3 className="h-5 w-5" />} 
+                  primaryColor={league.colors.primary}
+                  accentColor={league.colors.accent}
+                >
+                  <div className="h-96 flex items-center justify-center text-white/50 border border-dashed border-white/20 rounded-lg">
+                    {isAr ? 'سيتم إضافة جدول الترتيب قريباً' : 'Standings table coming soon'}
+                  </div>
+                </ContentCard>
+              </section>
             )}
 
             {league.apiLeagueId && (
-              <ContentCard 
-                title={isAr ? 'الهدافون' : 'Top Scorers'} 
-                icon={<Trophy />} 
-                primaryColor={league.colors.primary}
-                accentColor={league.colors.accent}
-              >
-                <LeagueTopScorers 
-                  leagueId={league.apiLeagueId} 
-                  season={league.season || 2026} 
-                  accentColor={league.colors.accent} 
-                />
-              </ContentCard>
+              <section id="top-scorers">
+                <ContentCard 
+                  title={isAr ? 'ترتيب الهدافين (الحذاء الذهبي)' : 'Top Scorers (Golden Boot)'} 
+                  icon={<Trophy className="h-5 w-5" />} 
+                  primaryColor={league.colors.primary}
+                  accentColor={league.colors.accent}
+                >
+                  <LeagueTopScorers 
+                    leagueId={league.apiLeagueId} 
+                    season={league.season || 2026} 
+                    accentColor={league.colors.accent} 
+                  />
+                </ContentCard>
+              </section>
             )}
           </div>
 
-        </div>
-      </section>
+          {/* Sidebar Column (1/3) - Pulse/Latest News */}
+          <aside className="space-y-8">
+            <section id="league-pulse">
+              <ContentCard 
+                title={isAr ? 'نبض الدوري' : 'League Pulse News'} 
+                icon={<Newspaper className="h-5 w-5" />} 
+                primaryColor={league.colors.primary}
+                accentColor={league.colors.accent}
+              >
+                <div className="space-y-3">
+                  {leagueNews.length > 0 ? (
+                    leagueNews.map((n) => (
+                      <div 
+                        key={n.id} 
+                        className="block p-4 rounded-lg border border-white/10 bg-black/35 hover:border-white/20 hover:shadow-lg transition-all group"
+                      >
+                        <span className="inline-block px-2 py-0.5 rounded text-[9px] font-bold mb-2 border" style={{ backgroundColor: `${league.colors.accent}15`, color: league.colors.accent, borderColor: `${league.colors.accent}30` }}>
+                          {isAr ? 'نبض الدوري' : 'PULSE'}
+                        </span>
+                        <p className={cn('text-sm font-medium transition-colors leading-relaxed text-start text-white group-hover:text-primary-glow', isAr && 'font-arabic')}>
+                          {isAr ? n.title_ar || n.title_en : n.title_en || n.title_ar}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="h-48 flex items-center justify-center text-white/50 border border-dashed border-white/20 rounded-lg">
+                      {isAr ? 'لا توجد أخبار مضافة حالياً لهذا الدوري' : 'No news articles available for this league yet'}
+                    </div>
+                  )}
+                </div>
+              </ContentCard>
+            </section>
+          </aside>
+
+        </section>
+      </main>
 
       <One2Footer />
     </div>

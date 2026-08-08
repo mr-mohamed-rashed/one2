@@ -13,12 +13,22 @@ export function useNewsCategories() {
       .select('name')
       .order('created_at', { ascending: true });
 
+    const staticLeagues = ['epl', 'laliga', 'seriea', 'bundesliga', 'ligue1', 'ucl', 'epl_egypt'];
+
     if (error) {
       console.error('[news_categories] fetch error:', error);
       // Fallback to minimal array if table is missing or errors
-      setCategories(['News 2026']);
+      setCategories(['News 2026', ...staticLeagues]);
     } else if (data) {
       const names = data.map((d) => d.name);
+      
+      // Auto-append static leagues if not already in the DB list
+      staticLeagues.forEach((l) => {
+        if (!names.includes(l)) {
+          names.push(l);
+        }
+      });
+
       if (!names.includes('News 2026')) {
         names.unshift('News 2026');
       }
