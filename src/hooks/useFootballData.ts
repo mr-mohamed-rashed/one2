@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { teams, getFinishedMatches, getUpcomingMatches, getLiveMatches } from '@/lib/footballData';
 import type { Match, Scorer } from '@/lib/footballData';
 import { queryClient } from '@/App';
+import { leaguesConfig } from '@/lib/leaguesConfig';
 
 const COUNTRY_FLAGS: Record<string, string> = {
   'الأرجنتين': 'ar', 'فرنسا': 'fr', 'البرازيل': 'br', 'النرويج': 'no',
@@ -771,6 +772,12 @@ function mapScorer(s: ApiScorer, i: number) {
 
 // ---------- League-Specific Hooks (API-Football Direct) ----------
 
+const getApiKeyForLeagueId = (apiLeagueId?: number) => {
+  if (!apiLeagueId) return '19a3b0d1fe31969b6b6e615f1c38fccd';
+  const league = Object.values(leaguesConfig).find((l) => l.apiLeagueId === apiLeagueId);
+  return league?.apiKey || '19a3b0d1fe31969b6b6e615f1c38fccd';
+};
+
 export function useLeagueAllFixtures(leagueId?: number, season?: number) {
   return useQuery({
     queryKey: ['league-fixtures', leagueId, season],
@@ -781,7 +788,7 @@ export function useLeagueAllFixtures(leagueId?: number, season?: number) {
           method: 'GET',
           headers: {
             'x-rapidapi-host': 'v3.football.api-sports.io',
-            'x-rapidapi-key': '19a3b0d1fe31969b6b6e615f1c38fccd'
+            'x-rapidapi-key': getApiKeyForLeagueId(leagueId)
           }
         });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -835,7 +842,7 @@ export function useLeagueStandings(leagueId?: number, season?: number) {
           method: 'GET',
           headers: {
             'x-rapidapi-host': 'v3.football.api-sports.io',
-            'x-rapidapi-key': '19a3b0d1fe31969b6b6e615f1c38fccd'
+            'x-rapidapi-key': getApiKeyForLeagueId(leagueId)
           }
         });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -895,7 +902,7 @@ export function useLeagueTopScorers(leagueId?: number, season?: number) {
           method: 'GET',
           headers: {
             'x-rapidapi-host': 'v3.football.api-sports.io',
-            'x-rapidapi-key': '19a3b0d1fe31969b6b6e615f1c38fccd'
+            'x-rapidapi-key': getApiKeyForLeagueId(leagueId)
           }
         });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);

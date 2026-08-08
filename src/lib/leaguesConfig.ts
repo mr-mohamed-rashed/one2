@@ -12,6 +12,7 @@ export interface LeagueTheme {
   coverImage: string;
   apiLeagueId?: number;
   season?: number;
+  apiKey?: string;
 }
 
 export const leaguesConfig: Record<string, LeagueTheme> = {
@@ -29,6 +30,7 @@ export const leaguesConfig: Record<string, LeagueTheme> = {
     coverImage: '/images/hub/epl-bg.png', // User will upload
     apiLeagueId: 39,
     season: 2026,
+    apiKey: '19a3b0d1fe31969b6b6e615f1c38fccd',
   },
   ligue1: {
     id: 'ligue1',
@@ -44,6 +46,7 @@ export const leaguesConfig: Record<string, LeagueTheme> = {
     coverImage: '/images/hub/ligue1-bg.png',
     apiLeagueId: 61,
     season: 2026,
+    apiKey: '19a3b0d1fe31969b6b6e615f1c38fccd',
   },
   laliga: {
     id: 'laliga',
@@ -59,6 +62,7 @@ export const leaguesConfig: Record<string, LeagueTheme> = {
     coverImage: '/images/hub/laliga-bg.png',
     apiLeagueId: 140,
     season: 2026,
+    apiKey: '19a3b0d1fe31969b6b6e615f1c38fccd',
   },
   seriea: {
     id: 'seriea',
@@ -74,6 +78,7 @@ export const leaguesConfig: Record<string, LeagueTheme> = {
     coverImage: '/images/hub/seriea-bg.png',
     apiLeagueId: 135,
     season: 2026,
+    apiKey: '19a3b0d1fe31969b6b6e615f1c38fccd',
   },
   ucl: {
     id: 'ucl',
@@ -89,6 +94,7 @@ export const leaguesConfig: Record<string, LeagueTheme> = {
     coverImage: '/images/hub/ucl-bg.png',
     apiLeagueId: 2,
     season: 2026,
+    apiKey: '19a3b0d1fe31969b6b6e615f1c38fccd',
   },
   epl_egypt: {
     id: 'epl_egypt',
@@ -104,6 +110,7 @@ export const leaguesConfig: Record<string, LeagueTheme> = {
     coverImage: '/images/hub/egypt-bg.png',
     apiLeagueId: 233,
     season: 2026,
+    apiKey: '19a3b0d1fe31969b6b6e615f1c38fccd',
   },
   bundesliga: {
     id: 'bundesliga',
@@ -119,5 +126,6 @@ export const leaguesConfig: Record<string, LeagueTheme> = {
     coverImage: '/images/hub/bundesliga-bg.png',
     apiLeagueId: 78,
     season: 2026,
+    apiKey: '19a3b0d1fe31969b6b6e615f1c38fccd',
   },
 };
