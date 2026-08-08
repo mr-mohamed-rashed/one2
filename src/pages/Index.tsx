@@ -62,7 +62,7 @@ const leagues = [
     id: 'worldcup2026',
     title: { en: 'WORLD CUP 2026 ARCHIVE', ar: 'أرشيف كأس العالم 2026' },
     image: '/images/hub/worldcup-bg.png',
-    logo: '/images/world-cup-trophy.png',
+    logo: '/images/hub/worldcup-logo.png',
     link: '/world-cup',
   },
 ];
