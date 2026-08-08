@@ -27,6 +27,7 @@ const leagues = [
     id: 'laliga',
     title: { en: 'LA LIGA (SPAIN)', ar: 'الدوري الإسباني' },
     image: '/images/hub/laliga-bg.png',
+    logo: '/images/hub/laliga-logo.png',
     link: '/league/laliga',
   },
   {
