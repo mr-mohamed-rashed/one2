@@ -19,6 +19,7 @@ import { GoogleAuthGate } from './components/one2/GoogleAuthGate';
 import { PwaInstallPrompt } from './components/one2/PwaInstallPrompt';
 import TermsOfService from './pages/TermsOfService';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import Transfers from './pages/Transfers';
 
 const Layout = () => {
   const location = useLocation();
@@ -75,6 +76,7 @@ export const routers = [
       { path: '/live', name: 'live', element: <LiveMatches /> },
       { path: '/results', name: 'results', element: <Results /> },
       { path: '/admin', name: 'admin', element: <Admin /> },
+      { path: '/transfers', name: 'transfers', element: <Transfers /> },
       { path: '/terms-of-service', name: 'terms', element: <TermsOfService /> },
       { path: '/privacy-policy', name: 'privacy', element: <PrivacyPolicy /> },
       { path: '*', name: '404', element: <NotFound /> },

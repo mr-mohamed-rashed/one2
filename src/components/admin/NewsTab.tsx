@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import type { ReactNode } from 'react';
-import { Check, Eye, EyeOff, FileText, Loader2, Newspaper, Plus, Save, Trash2, Zap, ArrowUp, ArrowDown, Edit, Bot, Radio } from 'lucide-react';
+import { Check, Eye, EyeOff, FileText, Loader2, Newspaper, Plus, Save, Trash2, Zap, ArrowUp, ArrowDown, Edit, Bot, Radio, ArrowLeftRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -14,6 +14,7 @@ import { useManualNews, type ManualNewsRow, isSystemCategory, getNewsType, getNe
 import { useNewsCategories } from '@/hooks/useNewsCategories';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { toast } from '@/hooks/use-toast';
+import { leaguesConfig } from '@/lib/leaguesConfig';
 
 type NewsDraft = Omit<ManualNewsRow, 'id' | 'created_at'>;
 
@@ -206,13 +207,174 @@ export function NewsTab() {
         description: 'تأكد من اتصالك بالإنترنت وحاول مجدداً.',
         variant: 'destructive',
       });
+  };
+
+  const blankTransferDraft = () => ({
+    player: '',
+    fee: '',
+    details: '',
+    leagueId: 'epl',
+    date: today(),
+  });
+
+  const [transferDraft, setTransferDraft] = useState(blankTransferDraft());
+  const [importingTransfers, setImportingTransfers] = useState(false);
+  const [transferImportLog, setTransferImportLog] = useState<string[]>([]);
+
+  const handleSaveTransfer = async () => {
+    if (!transferDraft.player.trim()) return;
+    setSaving(true);
+    
+    const itemData = {
+      title_ar: transferDraft.player,
+      title_en: transferDraft.player,
+      excerpt_ar: transferDraft.details,
+      excerpt_en: transferDraft.fee,
+      category: `transfers:${transferDraft.leagueId}`,
+      image_url: '',
+      published_at: transferDraft.date,
+      is_published: true,
+    };
+
+    if (editingId) {
+      await update(editingId, itemData);
+      setEditingId(null);
+    } else {
+      await save(itemData);
+    }
+    
+    setTransferDraft(blankTransferDraft());
+    setSaving(false);
+  };
+
+  const handleImportTransfers = async () => {
+    setImportingTransfers(true);
+    setTransferImportLog(['بدء جلب الانتقالات للفرق الكبرى...']);
+
+    // List of famous teams by league
+    const topTeams = [
+      { id: 49, league: 'epl', name: 'Chelsea' },
+      { id: 40, league: 'epl', name: 'Liverpool' },
+      { id: 50, league: 'epl', name: 'Man City' },
+      { id: 33, league: 'epl', name: 'Man United' },
+      { id: 42, league: 'epl', name: 'Arsenal' },
+      { id: 541, league: 'laliga', name: 'Real Madrid' },
+      { id: 529, league: 'laliga', name: 'Barcelona' },
+      { id: 530, league: 'laliga', name: 'Atletico Madrid' },
+      { id: 496, league: 'seriea', name: 'Juventus' },
+      { id: 489, league: 'seriea', name: 'AC Milan' },
+      { id: 505, league: 'seriea', name: 'Inter Milan' },
+      { id: 157, league: 'bundesliga', name: 'Bayern Munich' },
+      { id: 165, league: 'bundesliga', name: 'Dortmund' },
+      { id: 85, league: 'ligue1', name: 'PSG' },
+      { id: 1011, league: 'epl_egypt', name: 'Al Ahly' },
+      { id: 1012, league: 'epl_egypt', name: 'Zamalek' },
+    ];
+
+    try {
+      let importedCount = 0;
+      let skippedCount = 0;
+
+      for (const team of topTeams) {
+        setTransferImportLog((prev) => [...prev, `جاري جلب انتقالات نادي ${team.name}...`]);
+        
+        // Get apiKey for this league
+        const league = leaguesConfig[team.league];
+        const apiKey = league?.apiKey || '19a3b0d1fe31969b6b6e615f1c38fccd';
+
+        const response = await fetch(
+          `https://v3.football.api-sports.io/transfers?team=${team.id}`,
+          {
+            method: 'GET',
+            headers: {
+              'x-rapidapi-host': 'v3.football.api-sports.io',
+              'x-rapidapi-key': apiKey,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          setTransferImportLog((prev) => [...prev, `⚠️ فشل جلب صفقات نادي ${team.name}`]);
+          continue;
+        }
+
+        const data = await response.json();
+        if (data.errors && Object.keys(data.errors).length > 0) {
+          console.error(`API Error for ${team.name}:`, data.errors);
+          continue;
+        }
+
+        if (data.response && data.response.length > 0) {
+          // Loop through player transfers
+          for (const item of data.response.slice(0, 3)) { // take latest 3 players per team to save quota
+            const playerName = item.player.name;
+            const latestTransfer = item.transfers[0];
+            if (!latestTransfer) continue;
+
+            const date = latestTransfer.date;
+            const type = latestTransfer.type || 'Free Transfer';
+            const teamOut = latestTransfer.teams.out.name;
+            const teamIn = latestTransfer.teams.in.name;
+            
+            const detailsText = `${teamOut} ➡️ ${teamIn}`;
+
+            // Check if duplicate
+            const isDuplicate = news.some(
+              (existing) =>
+                existing.category === `transfers:${team.league}` &&
+                existing.title_ar === playerName &&
+                existing.excerpt_ar === detailsText
+            );
+
+            if (isDuplicate) {
+              skippedCount++;
+              continue;
+            }
+
+            // Save to database
+            await save({
+              title_ar: playerName,
+              title_en: playerName,
+              excerpt_ar: detailsText,
+              excerpt_en: type,
+              category: `transfers:${team.league}`,
+              image_url: '',
+              published_at: date,
+              is_published: true,
+            });
+
+            setTransferImportLog((prev) => [
+              ...prev,
+              `✅ انتقال رسمي: ${playerName} من ${teamOut} إلى ${teamIn} (${type})`,
+            ]);
+            importedCount++;
+          }
+        }
+        
+        // Wait 100ms
+        await new Promise((r) => setTimeout(r, 100));
+      }
+
+      setTransferImportLog((prev) => [
+        ...prev,
+        `🎉 انتهى جلب الانتقالات! تم استيراد ${importedCount} صفقة جديدة، وتخطي ${skippedCount} مكررة.`,
+      ]);
+
+      toast({
+        title: 'اكتمل استيراد الانتقالات',
+        description: `تم استيراد ${importedCount} صفقة جديدة بنجاح.`,
+      });
+    } catch (err) {
+      console.error('Import transfers failed:', err);
+      setTransferImportLog((prev) => [...prev, '❌ فشل جلب صفقات الانتقالات.']);
     } finally {
-      setImporting(false);
+      setImportingTransfers(false);
     }
   };
 
   const tickerItems = news.filter((item) => getNewsType(item.category) === 'Ticker');
   const pulseItems = news.filter((item) => getNewsType(item.category) === 'Pulse');
+  const transferItems = news.filter((item) => item.category && item.category.startsWith('transfers:'));
   const articleItems = news.filter((item) => getNewsType(item.category) === 'Article');
   const botMessageItems = news.filter((item) => item.category === 'BotMessage');
 
@@ -298,7 +460,7 @@ export function NewsTab() {
         setArticle(blankArticle());
         setBotMessage(blankBotMessage());
       }}>
-        <TabsList className="grid h-auto grid-cols-1 gap-2 bg-card p-1 sm:grid-cols-5">
+        <TabsList className="grid h-auto grid-cols-1 gap-2 bg-card p-1 sm:grid-cols-6">
           <TabsTrigger value="ticker" className="gap-2 py-3">
             <Zap className="h-4 w-4" />
             الشريط
@@ -310,6 +472,10 @@ export function NewsTab() {
           <TabsTrigger value="pulse" className="gap-2 py-3">
             <Newspaper className="h-4 w-4" />
             نبض 2026
+          </TabsTrigger>
+          <TabsTrigger value="transfers" className="gap-2 py-3">
+            <ArrowLeftRight className="h-4 w-4" />
+            الانتقالات
           </TabsTrigger>
           <TabsTrigger value="bots" className="gap-2 py-3">
             <Bot className="h-4 w-4" />
@@ -535,6 +701,153 @@ export function NewsTab() {
             </div>
           </Card>
           <NewsList items={pulseItems} empty="لا توجد عناصر في نبض 2026 حتى الآن." onRemove={remove} onToggle={togglePublish} onReorder={reorder} onEdit={(item) => handleEdit(item, setPulse)} />
+        </TabsContent>
+
+        <TabsContent value="transfers" className="space-y-4">
+          <Card className="border-primary/25 bg-gradient-card p-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-white/5 pb-4">
+              <SectionTitle
+                title="إدارة صفقات الانتقالات"
+                description="إضافة وتعديل صفقات الانتقالات الرسمية للدوريات المختلفة يدوياً أو استيرادها تلقائياً."
+              />
+              
+              <Button 
+                onClick={handleImportTransfers}
+                disabled={importingTransfers}
+                variant="outline"
+                className="h-10 text-primary border-primary/30 hover:bg-primary/5 font-bold gap-2 shrink-0 self-start"
+              >
+                {importingTransfers ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    جاري السحب...
+                  </>
+                ) : (
+                  <>
+                    <Radio className="h-4 w-4 animate-pulse" />
+                    استيراد صفقات الكبار تلقائياً
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {transferImportLog.length > 0 && (
+              <div className="mt-4 rounded-xl border border-white/10 bg-black/60 p-4 font-mono text-xs text-start space-y-1 max-h-40 overflow-y-auto">
+                <div className="text-muted-foreground font-arabic font-bold text-xs pb-1 border-b border-white/5 mb-1">
+                  سجل استيراد صفقات الكبار:
+                </div>
+                {transferImportLog.map((log, idx) => (
+                  <div 
+                    key={idx} 
+                    className={cn(
+                      "leading-relaxed font-arabic",
+                      log.startsWith('✅') && "text-green-400 font-semibold",
+                      log.startsWith('❌') && "text-red-400 font-semibold",
+                      log.startsWith('⚠️') && "text-yellow-400 font-semibold",
+                      log.startsWith('🎉') && "text-primary font-extrabold mt-1"
+                    )}
+                  >
+                    {log}
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            <div className="mt-4 space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="اسم اللاعب">
+                  <Input
+                    value={transferDraft.player}
+                    onChange={(e) => setTransferDraft(prev => ({ ...prev, player: e.target.value }))}
+                    placeholder="مثال: كيليان مبابي"
+                    className="h-11 text-right"
+                  />
+                </Field>
+                <Field label="قيمة الصفقة / نوع الانتقال">
+                  <Input
+                    value={transferDraft.fee}
+                    onChange={(e) => setTransferDraft(prev => ({ ...prev, fee: e.target.value }))}
+                    placeholder="مثال: €150M أو انتقال حر"
+                    className="h-11 text-right"
+                  />
+                </Field>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="تفاصيل الانتقال (من نادي ➡️ إلى نادي)">
+                  <Input
+                    value={transferDraft.details}
+                    onChange={(e) => setTransferDraft(prev => ({ ...prev, details: e.target.value }))}
+                    placeholder="مثال: باريس سان جيرمان ➡️ ريال مدريد"
+                    className="h-11 text-right"
+                  />
+                </Field>
+                <Field label="الدوري المعني">
+                  <Select
+                    value={transferDraft.leagueId}
+                    onValueChange={(val) => setTransferDraft(prev => ({ ...prev, leagueId: val }))}
+                  >
+                    <SelectTrigger className="h-11">
+                      <SelectValue placeholder="اختر الدوري" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(leaguesConfig).map((l) => (
+                        <SelectItem key={l.id} value={l.id}>
+                          {isAr ? l.nameAr : l.nameEn}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="تاريخ الصفقة">
+                  <Input
+                    type="date"
+                    value={transferDraft.date}
+                    onChange={(e) => setTransferDraft(prev => ({ ...prev, date: e.target.value }))}
+                    className="h-11"
+                  />
+                </Field>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3">
+                <Button 
+                  onClick={handleSaveTransfer} 
+                  disabled={saving || !transferDraft.player.trim()}
+                  className="h-11 px-6 font-bold bg-primary text-primary-foreground hover:bg-primary-glow"
+                >
+                  {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                  {editingId ? 'تعديل الصفقة' : 'حفظ الصفقة'}
+                </Button>
+                {editingId && (
+                  <Button variant="outline" className="h-11 font-semibold" onClick={() => { setEditingId(null); setTransferDraft(blankTransferDraft()); }}>
+                    إلغاء
+                  </Button>
+                )}
+              </div>
+            </div>
+          </Card>
+          
+          <NewsList 
+            items={transferItems} 
+            empty="لا توجد صفقات انتقالات مضافة حالياً." 
+            onRemove={remove} 
+            onToggle={togglePublish} 
+            onReorder={reorder} 
+            onEdit={(item) => {
+              setEditingId(item.id);
+              const leagueId = item.category.replace('transfers:', '');
+              setTransferDraft({
+                player: item.title_ar || '',
+                fee: item.excerpt_en || '',
+                details: item.excerpt_ar || '',
+                leagueId: leagueId,
+                date: item.published_at || today(),
+              });
+            }} 
+          />
         </TabsContent>
 
         <TabsContent value="bots" className="space-y-4">
