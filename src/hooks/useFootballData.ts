@@ -769,6 +769,168 @@ function mapScorer(s: ApiScorer, i: number) {
   };
 }
 
+// ---------- League-Specific Hooks (API-Football Direct) ----------
+
+export function useLeagueAllFixtures(leagueId?: number, season?: number) {
+  return useQuery({
+    queryKey: ['league-fixtures', leagueId, season],
+    queryFn: async () => {
+      if (!leagueId || !season) return [];
+      try {
+        const response = await fetch(`https://v3.football.api-sports.io/fixtures?league=${leagueId}&season=${season}`, {
+          method: 'GET',
+          headers: {
+            'x-rapidapi-host': 'v3.football.api-sports.io',
+            'x-rapidapi-key': '19a3b0d1fe31969b6b6e615f1c38fccd'
+          }
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        
+        if (data.errors && Object.keys(data.errors).length > 0) {
+          console.error('[API-Football] errors:', data.errors);
+          return [];
+        }
+
+        let results: Match[] = [];
+        if (data?.response?.length) {
+          results = data.response.map(mapFixture);
+        }
+        return results;
+      } catch (err) {
+        console.error('[API-Football] useLeagueAllFixtures error:', err);
+        return [];
+      }
+    },
+    enabled: !!leagueId && !!season,
+    refetchInterval: 120_000, // 2 minutes
+  });
+}
+
+export interface StandingsTeam {
+  rank: number;
+  team: {
+    id: string;
+    name: string;
+    logo: string;
+  };
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  gf: number;
+  ga: number;
+  gd: number;
+  points: number;
+  form?: string;
+}
+
+export function useLeagueStandings(leagueId?: number, season?: number) {
+  return useQuery({
+    queryKey: ['league-standings', leagueId, season],
+    queryFn: async () => {
+      if (!leagueId || !season) return [];
+      try {
+        const response = await fetch(`https://v3.football.api-sports.io/standings?league=${leagueId}&season=${season}`, {
+          method: 'GET',
+          headers: {
+            'x-rapidapi-host': 'v3.football.api-sports.io',
+            'x-rapidapi-key': '19a3b0d1fe31969b6b6e615f1c38fccd'
+          }
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        
+        if (data.errors && Object.keys(data.errors).length > 0) {
+          console.error('[API-Football] errors:', data.errors);
+          return [];
+        }
+
+        const standings = data?.response?.[0]?.league?.standings?.[0] || [];
+        return standings.map((item: any) => ({
+          rank: item.rank,
+          team: {
+            id: String(item.team.id),
+            name: item.team.name,
+            logo: item.team.logo,
+          },
+          played: item.all.played,
+          won: item.all.win,
+          drawn: item.all.draw,
+          lost: item.all.lose,
+          gf: item.all.goals.for,
+          ga: item.all.goals.against,
+          gd: item.goalsDiff,
+          points: item.points,
+          form: item.form,
+        })) as StandingsTeam[];
+      } catch (err) {
+        console.error('[API-Football] useLeagueStandings error:', err);
+        return [];
+      }
+    },
+    enabled: !!leagueId && !!season,
+    refetchInterval: 300_000, // 5 minutes
+  });
+}
+
+export interface ScorersPlayer {
+  rank: number;
+  name: string;
+  club: string;
+  goals: number;
+  assists: number;
+  matches: number;
+  photo: string;
+  logo: string;
+}
+
+export function useLeagueTopScorers(leagueId?: number, season?: number) {
+  return useQuery({
+    queryKey: ['league-topscorers', leagueId, season],
+    queryFn: async () => {
+      if (!leagueId || !season) return [];
+      try {
+        const response = await fetch(`https://v3.football.api-sports.io/players/topscorers?league=${leagueId}&season=${season}`, {
+          method: 'GET',
+          headers: {
+            'x-rapidapi-host': 'v3.football.api-sports.io',
+            'x-rapidapi-key': '19a3b0d1fe31969b6b6e615f1c38fccd'
+          }
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        
+        if (data.errors && Object.keys(data.errors).length > 0) {
+          console.error('[API-Football] errors:', data.errors);
+          return [];
+        }
+
+        const players = data?.response || [];
+        return players.map((item: any, index: number) => {
+          const p = item.player;
+          const stat = item.statistics[0];
+          return {
+            rank: index + 1,
+            name: p.name,
+            club: stat.team.name,
+            goals: stat.goals.total || 0,
+            assists: stat.goals.assists || 0,
+            matches: stat.games.appearences || 0,
+            photo: p.photo,
+            logo: stat.team.logo,
+          };
+        }) as ScorersPlayer[];
+      } catch (err) {
+        console.error('[API-Football] useLeagueTopScorers error:', err);
+        return [];
+      }
+    },
+    enabled: !!leagueId && !!season,
+    refetchInterval: 600_000, // 10 minutes
+  });
+}
+
 export type { ApiStandingGroup };
 
 
