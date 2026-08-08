@@ -3,10 +3,19 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useSiteSettingsContext } from '@/context/SiteSettingsContext';
 import { useManualNews } from '@/hooks/useManualNews';
 import { useRealNews, formatForTicker } from '@/hooks/useRealNews';
+import { leaguesConfig } from '@/lib/leaguesConfig';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
-export function NewsTicker({ variant = 'default', className }: { variant?: 'default' | 'video', className?: string } = {}) {
+export function NewsTicker({ 
+  variant = 'default', 
+  className,
+  leagueId
+}: { 
+  variant?: 'default' | 'video'; 
+  className?: string;
+  leagueId?: string;
+} = {}) {
   const { lang } = useLanguage();
   const { get } = useSiteSettingsContext();
   const { news: manualNews, loading: manualLoading } = useManualNews(true);
@@ -14,19 +23,43 @@ export function NewsTicker({ variant = 'default', className }: { variant?: 'defa
   const desktopSpeed = Math.max(25, Math.min(500, Number(get('ticker_speed_seconds') || 70)));
   const mobileSpeed = Math.max(25, Math.min(500, Number(get('ticker_speed_mobile_seconds') || 120)));
 
-  const manualItems = manualNews
-    .filter((item) => item.category === 'Ticker')
-    .slice(0, 12)
-    .map((item) => ({
-      tag: lang === 'ar' ? 'خبر عاجل' : 'NEWS',
-      text: lang === 'ar' ? item.title_ar || item.title_en : item.title_en || item.title_ar,
-    }))
-    .filter((item) => item.text);
+  const league = leagueId ? leaguesConfig[leagueId] : null;
 
-  const tickerItems = [...manualItems, ...formatForTicker(realNews, lang)];
+  const manualItems = leagueId
+    ? manualNews
+        .filter((item) => {
+          const cat = item.category?.toLowerCase() || '';
+          const lid = leagueId.toLowerCase();
+          
+          // Custom check for epl_egypt to match Egypt/مصر categories as well
+          if (lid === 'epl_egypt') {
+            return cat.includes('egypt') || cat.includes('مصر') || cat.includes('egy') || cat === 'egyptian';
+          }
+          
+          return cat === lid || cat.includes(lid);
+        })
+        .slice(0, 10)
+        .map((item) => ({
+          tag: lang === 'ar' ? 'أخبار الدوري' : 'LEAGUE NEWS',
+          text: lang === 'ar' ? item.title_ar || item.title_en : item.title_en || item.title_ar,
+        }))
+        .filter((item) => item.text)
+    : manualNews
+        .filter((item) => item.category === 'Ticker')
+        .slice(0, 12)
+        .map((item) => ({
+          tag: lang === 'ar' ? 'خبر عاجل' : 'NEWS',
+          text: lang === 'ar' ? item.title_ar || item.title_en : item.title_en || item.title_ar,
+        }))
+        .filter((item) => item.text);
+
+  const tickerItems = leagueId 
+    ? manualItems 
+    : [...manualItems, ...formatForTicker(realNews, lang)];
+
   const fallbackItems = [
     {
-      tag: 'WORLD CUP',
+      tag: league ? 'NEWS' : 'WORLD CUP',
       text: lang === 'ar' ? 'جاري تحميل أحدث الأخبار...' : 'Loading latest news...',
     },
   ];
@@ -35,6 +68,10 @@ export function NewsTicker({ variant = 'default', className }: { variant?: 'defa
   const tickerSet = Array.from({ length: Math.max(2, Math.ceil(8 / items.length)) }, () => items).flat();
   const loop = [...tickerSet, ...tickerSet];
   const loading = isLoading || manualLoading;
+
+  const labelText = league
+    ? (lang === 'ar' ? `أخبار ${league.nameAr}` : `${league.nameEn} News`)
+    : (variant === 'video' ? 'ONE 2' : t('tickerLabel', lang));
 
   return (
     <div 
@@ -53,7 +90,7 @@ export function NewsTicker({ variant = 'default', className }: { variant?: 'defa
             <Radio className="h-3 w-3 animate-pulse-live" />
           )}
           <span className={lang === 'ar' ? 'font-arabic whitespace-nowrap' : 'whitespace-nowrap'}>
-            {variant === 'video' ? 'ONE 2' : t('tickerLabel', lang)}
+            {labelText}
           </span>
         </div>
         <div className="flex-1 overflow-hidden relative bg-gradient-ticker" dir="ltr">

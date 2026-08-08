@@ -48,7 +48,7 @@ const LeagueHome = () => {
       <Navigation />
       
       {/* News Ticker */}
-      <NewsTicker />
+      <NewsTicker leagueId={leagueId} />
 
       {/* Dynamic Themed Hero Section */}
       <section 
