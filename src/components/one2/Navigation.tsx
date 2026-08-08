@@ -35,14 +35,9 @@ export function Navigation() {
                 src="/images/one2-wings-logo.png" 
                 alt="One2 Logo" 
                 className="h-full w-auto object-contain drop-shadow-md"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                  document.getElementById('nav-logo-fallback')!.style.display = 'block';
-                }}
               />
               <span 
-                id="nav-logo-fallback"
-                className="hidden text-primary text-3xl font-black tracking-tight" 
+                className="text-primary text-2xl sm:text-3xl font-black tracking-tight ml-2 mr-2" 
                 style={{ 
                   textShadow: '0 1px 0 hsl(145, 70%, 25%), 0 2px 0 hsl(145, 70%, 20%), 0 3px 0 hsl(145, 70%, 15%), 0 4px 0 hsl(145, 70%, 10%), 0 0 15px rgba(34,197,94,0.6), 0 0 30px rgba(34,197,94,0.4)' 
                 }}

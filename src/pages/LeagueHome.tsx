@@ -47,7 +47,7 @@ const LeagueHome = () => {
 
       {/* Dynamic Themed Hero Section */}
       <section 
-        className="relative w-full h-[400px] sm:h-[500px] flex flex-col items-center justify-center overflow-hidden"
+        className="relative w-full min-h-[380px] sm:min-h-[450px] py-12 flex flex-col items-center justify-center overflow-hidden"
         style={{ borderBottom: `4px solid ${league.colors.accent}` }}
       >
         <div 
@@ -69,30 +69,38 @@ const LeagueHome = () => {
           }} 
         />
         
-        <div className="relative z-10 flex flex-col items-center justify-center mt-12 px-4 text-center">
-          <div className="relative w-44 sm:w-64 h-44 sm:h-64 mb-6">
-            <img 
-              src={league.logo} 
-              alt={isAr ? league.nameAr : league.nameEn} 
-              className="w-full h-full object-contain"
-              style={{ filter: `drop-shadow(0 0 30px ${league.colors.accent}80)` }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-                document.getElementById('league-logo-fallback')!.style.display = 'flex';
-              }}
-            />
-            <div id="league-logo-fallback" className="hidden absolute inset-0 flex-col items-center justify-center">
-              <Trophy className="w-20 h-20 mb-2" style={{ color: league.colors.accent }} />
+        <div className="relative z-10 flex flex-col items-center justify-center mt-6 px-4 text-center">
+          {/* Header Row: League Logo next to ONE2 Neon Name */}
+          <div className="flex items-center justify-center gap-4 mb-6 flex-wrap">
+            <div className="w-20 h-20 sm:w-28 sm:h-28 bg-white/95 border border-[#cda052]/30 rounded-2xl flex items-center justify-center shadow-[0_8px_24px_rgba(0,0,0,0.4)] p-2 shrink-0">
+              <img 
+                src={league.logo} 
+                alt="" 
+                className="max-h-[64px] max-w-[90px] object-contain"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
             </div>
+            
+            <span 
+              className="text-5xl sm:text-7xl font-display font-black tracking-widest uppercase"
+              style={{
+                color: '#ffffff',
+                textShadow: `0 0 10px ${league.colors.accent}, 0 0 20px ${league.colors.secondary}, 0 0 30px ${league.colors.primary}`
+              }}
+            >
+              ONE2
+            </span>
           </div>
+
           <h1 
             className={cn(
-              "font-display font-black text-4xl sm:text-6xl tracking-wider mb-2",
+              "font-display font-extrabold text-2xl sm:text-4xl mb-4 text-white/95",
               isAr && "font-arabic"
             )}
             style={{ 
-              textShadow: `0 4px 20px ${league.colors.secondary}`,
-              color: '#ffffff'
+              textShadow: `0 2px 10px ${league.colors.primary}`,
             }}
           >
             {isAr ? league.nameAr : league.nameEn}
