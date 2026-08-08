@@ -134,7 +134,7 @@ const Index = () => {
                   <img 
                     src={league.logo} 
                     alt="" 
-                    className="max-h-[85px] max-w-[150px] object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.7)]"
+                    className="max-h-[85px] max-w-[150px] object-contain drop-shadow-[0_0_12px_rgba(255,255,255,0.75)] drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
