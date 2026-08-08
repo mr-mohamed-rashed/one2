@@ -130,11 +130,11 @@ const Index = () => {
               
               {/* Logo Overlay */}
               {'logo' in league && league.logo && (
-                <div className="absolute inset-0 flex items-center justify-center pb-12 z-10 transition-transform duration-500 group-hover:scale-110">
+                <div className="absolute inset-0 flex items-center justify-center pb-14 z-10 transition-transform duration-500 group-hover:scale-110">
                   <img 
                     src={league.logo} 
                     alt="" 
-                    className="max-h-[60px] max-w-[120px] object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.7)]"
+                    className="max-h-[85px] max-w-[150px] object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.7)]"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
