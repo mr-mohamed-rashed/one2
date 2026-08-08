@@ -70,7 +70,7 @@ const LeagueHome = () => {
         />
         
         <div className="relative z-10 flex flex-col items-center justify-center mt-12 px-4 text-center">
-          <div className="relative w-32 sm:w-48 h-32 sm:h-48 mb-6">
+          <div className="relative w-44 sm:w-64 h-44 sm:h-64 mb-6">
             <img 
               src={league.logo} 
               alt={isAr ? league.nameAr : league.nameEn} 
