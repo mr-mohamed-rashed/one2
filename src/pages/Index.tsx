@@ -13,12 +13,14 @@ const leagues = [
     id: 'epl',
     title: { en: 'ENGLISH PREMIER LEAGUE', ar: 'الدوري الإنجليزي الممتاز' },
     image: '/images/hub/epl-bg.png', 
+    logo: '/images/hub/epl-logo.png',
     link: '/league/epl', 
   },
   {
     id: 'ligue1',
     title: { en: 'LIGUE 1 (FRANCE)', ar: 'الدوري الفرنسي' },
     image: '/images/hub/ligue1-bg.png',
+    logo: '/images/hub/ligue1-logo.png',
     link: '/league/ligue1',
   },
   {
@@ -31,30 +33,35 @@ const leagues = [
     id: 'seriea',
     title: { en: 'SERIE A (ITALY)', ar: 'الدوري الإيطالي' },
     image: '/images/hub/seriea-bg.png',
+    logo: '/images/hub/seriea-logo.png',
     link: '/league/seriea',
   },
   {
     id: 'ucl',
     title: { en: 'UEFA CHAMPIONS LEAGUE', ar: 'دوري أبطال أوروبا' },
     image: '/images/hub/ucl-bg.png',
+    logo: '/images/hub/ucl-logo.png',
     link: '/league/ucl',
   },
   {
     id: 'epl_egypt',
     title: { en: 'EGYPTIAN PREMIER LEAGUE', ar: 'الدوري المصري الممتاز' },
     image: '/images/hub/egypt-bg.png',
+    logo: '/images/hub/egypt-logo.png',
     link: '/league/epl_egypt',
   },
   {
     id: 'bundesliga',
     title: { en: 'BUNDESLIGA (GERMANY)', ar: 'الدوري الألماني' },
     image: '/images/hub/bundesliga-bg.png',
+    logo: '/images/hub/bundesliga-logo.png',
     link: '/league/bundesliga',
   },
   {
     id: 'worldcup2026',
     title: { en: 'WORLD CUP 2026 ARCHIVE', ar: 'أرشيف كأس العالم 2026' },
     image: '/images/hub/worldcup-bg.png',
+    logo: '/images/world-cup-trophy.png',
     link: '/world-cup',
   },
 ];
@@ -120,6 +127,20 @@ const Index = () => {
               {/* Fallback pattern if image is missing */}
               <div className="absolute inset-0 bg-gradient-to-tr from-[#0a0f18] to-transparent opacity-80" />
               
+              {/* Logo Overlay */}
+              {'logo' in league && league.logo && (
+                <div className="absolute inset-0 flex items-center justify-center pb-12 z-10 transition-transform duration-500 group-hover:scale-110">
+                  <img 
+                    src={league.logo} 
+                    alt="" 
+                    className="max-h-[60px] max-w-[120px] object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.7)]"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
+
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
               
               <div className="relative z-10 w-full p-3 sm:p-4 text-center border-t border-[#cda052]/30 bg-black/40 backdrop-blur-sm">
