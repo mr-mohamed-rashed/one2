@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Navigation } from '@/components/one2/Navigation';
-import { NewsTicker } from '@/components/one2/NewsTicker';
 import { One2Footer } from '@/components/one2/One2Footer';
 import { useLanguage } from '@/context/LanguageContext';
 import { useManualNews } from '@/hooks/useManualNews';
@@ -50,7 +49,6 @@ const Transfers = () => {
   return (
     <div className="min-h-screen bg-background text-white" dir={dir}>
       <Navigation />
-      <NewsTicker />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-card to-background py-12">

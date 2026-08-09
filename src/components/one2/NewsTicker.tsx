@@ -44,14 +44,54 @@ export function NewsTicker({
           text: lang === 'ar' ? item.title_ar || item.title_en : item.title_en || item.title_ar,
         }))
         .filter((item) => item.text)
-    : manualNews
-        .filter((item) => item.category === 'Ticker')
-        .slice(0, 12)
-        .map((item) => ({
-          tag: lang === 'ar' ? 'خبر عاجل' : 'NEWS',
-          text: lang === 'ar' ? item.title_ar || item.title_en : item.title_en || item.title_ar,
-        }))
-        .filter((item) => item.text);
+    : (() => {
+        const categories = [
+          'Ticker',
+          'Ticker:epl',
+          'Ticker:laliga',
+          'Ticker:seriea',
+          'Ticker:bundesliga',
+          'Ticker:ligue1',
+          'Ticker:ucl',
+          'Ticker:epl_egypt'
+        ];
+
+        const result: any[] = [];
+
+        categories.forEach(cat => {
+          const catNews = manualNews.filter(n => n.category === cat);
+          if (catNews.length === 0) return;
+
+          const sorted = [...catNews].sort((a, b) => 
+            new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
+          );
+          
+          const latestDateStr = sorted[0].published_at;
+          const latestDayNews = sorted.filter(n => n.published_at === latestDateStr);
+          
+          let tag = lang === 'ar' ? 'خبر عاجل' : 'NEWS';
+          if (cat !== 'Ticker') {
+            const lid = cat.replace('Ticker:', '');
+            const leagueConf = leaguesConfig[lid];
+            if (leagueConf) {
+              tag = lang === 'ar' ? leagueConf.nameAr : leagueConf.nameEn;
+            }
+          }
+
+          const mapped = latestDayNews.map(item => ({
+            tag,
+            text: lang === 'ar' ? item.title_ar || item.title_en : item.title_en || item.title_ar,
+            published_at: item.published_at
+          }));
+
+          result.push(...mapped);
+        });
+
+        return result
+          .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
+          .map(({ tag, text }) => ({ tag, text }))
+          .filter((item) => item.text);
+      })();
 
   const tickerItems = leagueId 
     ? manualItems 
