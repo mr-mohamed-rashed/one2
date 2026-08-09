@@ -174,11 +174,23 @@ export function useAllLiveFixtures() {
     queryKey: ['all-live-fixtures'],
     queryFn: async () => {
       try {
+        let apiKey = '19a3b0d1fe31969b6b6e615f1c38fccd';
+        try {
+          const { data: eplKeySetting } = await supabase
+            .from('site_settings')
+            .select('value_en')
+            .eq('key', 'api_key_epl')
+            .single();
+          if (eplKeySetting?.value_en) {
+            apiKey = eplKeySetting.value_en;
+          }
+        } catch {}
+
         const response = await fetch('https://v3.football.api-sports.io/fixtures?live=all', {
           method: 'GET',
           headers: {
             'x-rapidapi-host': 'v3.football.api-sports.io',
-            'x-rapidapi-key': '19a3b0d1fe31969b6b6e615f1c38fccd'
+            'x-rapidapi-key': apiKey
           }
         });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -189,9 +201,16 @@ export function useAllLiveFixtures() {
           return [];
         }
 
+        const interestedLeagueIds = Object.values(leaguesConfig)
+          .map(l => l.apiLeagueId)
+          .filter(Boolean) as number[];
+
         let results: Match[] = [];
         if (data?.response?.length) {
-          results = data.response.map(mapFixture);
+          const filteredResponse = data.response.filter((item: any) => 
+            item?.league?.id && interestedLeagueIds.includes(Number(item.league.id))
+          );
+          results = filteredResponse.map(mapFixture);
         }
         return results;
       } catch (err) {
