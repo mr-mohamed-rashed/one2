@@ -15,6 +15,7 @@ import { useNewsCategories } from '@/hooks/useNewsCategories';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { toast } from '@/hooks/use-toast';
 import { leaguesConfig } from '@/lib/leaguesConfig';
+import { useLanguage } from '@/context/LanguageContext';
 
 type NewsDraft = Omit<ManualNewsRow, 'id' | 'created_at'>;
 
@@ -64,7 +65,9 @@ const blankArticle = (): NewsDraft => ({
   is_published: true,
 });
 
-export function NewsTab() {
+export function NewsTab({ activeLeague = 'worldcup' }: { activeLeague?: string }) {
+  const { lang } = useLanguage();
+  const isAr = lang === 'ar';
   const { news, loading, save, update, remove, togglePublish, reorder } = useManualNews();
   const { settings, save: saveSetting } = useSiteSettings();
   const [saving, setSaving] = useState(false);
@@ -216,11 +219,18 @@ export function NewsTab() {
     player: '',
     fee: '',
     details: '',
-    leagueId: 'epl',
+    leagueId: activeLeague !== 'worldcup' ? activeLeague : 'epl',
     date: today(),
   });
 
   const [transferDraft, setTransferDraft] = useState(blankTransferDraft());
+
+  useEffect(() => {
+    if (activeLeague !== 'worldcup') {
+      setTransferDraft((prev) => ({ ...prev, leagueId: activeLeague }));
+    }
+  }, [activeLeague]);
+
   const [importingTransfers, setImportingTransfers] = useState(false);
   const [transferImportLog, setTransferImportLog] = useState<string[]>([]);
 
@@ -246,7 +256,10 @@ export function NewsTab() {
       await save(itemData);
     }
     
-    setTransferDraft(blankTransferDraft());
+    setTransferDraft({
+      ...blankTransferDraft(),
+      leagueId: activeLeague !== 'worldcup' ? activeLeague : 'epl'
+    });
     setSaving(false);
   };
 
@@ -379,10 +392,32 @@ export function NewsTab() {
     }
   };
 
-  const tickerItems = news.filter((item) => getNewsType(item.category) === 'Ticker');
-  const pulseItems = news.filter((item) => getNewsType(item.category) === 'Pulse');
-  const transferItems = news.filter((item) => item.category && item.category.startsWith('transfers:'));
-  const articleItems = news.filter((item) => getNewsType(item.category) === 'Article');
+  const getLeagueCategory = (type: 'Ticker' | 'Pulse' | 'Article') => {
+    if (!activeLeague || activeLeague === 'worldcup') {
+      return type === 'Article' ? 'News 2026' : type;
+    }
+    if (type === 'Article') return activeLeague;
+    return `${type}:${activeLeague}`;
+  };
+
+  const tickerItems = news.filter((item) => 
+    activeLeague === 'worldcup' 
+      ? item.category === 'Ticker' 
+      : item.category === `Ticker:${activeLeague}`
+  );
+  const pulseItems = news.filter((item) => 
+    activeLeague === 'worldcup' 
+      ? item.category === 'Pulse' 
+      : item.category === `Pulse:${activeLeague}`
+  );
+  const transferItems = news.filter((item) => 
+    item.category === `transfers:${activeLeague}`
+  );
+  const articleItems = news.filter((item) => 
+    activeLeague === 'worldcup'
+      ? !isSystemCategory(item.category)
+      : item.category === activeLeague
+  );
   const botMessageItems = news.filter((item) => item.category === 'BotMessage');
 
   const { categories: allCategories, addCategory, deleteCategory } = useNewsCategories();
@@ -395,11 +430,23 @@ export function NewsTab() {
   const addItem = async (draft: NewsDraft, reset: () => void) => {
     if (!draft.title_ar.trim() && !draft.title_en.trim()) return;
     setSaving(true);
+
+    const updatedDraft = { ...draft };
+    if (draft.category === 'Ticker' || draft.category?.startsWith('Ticker:')) {
+      updatedDraft.category = getLeagueCategory('Ticker');
+    } else if (draft.category === 'Pulse' || draft.category?.startsWith('Pulse:')) {
+      updatedDraft.category = getLeagueCategory('Pulse');
+    } else if (draft.category === 'BotMessage') {
+      updatedDraft.category = 'BotMessage';
+    } else if (activeLeague !== 'worldcup') {
+      updatedDraft.category = activeLeague;
+    }
+
     if (editingId) {
-      await update(editingId, draft);
+      await update(editingId, updatedDraft);
       setEditingId(null);
     } else {
-      await save(draft);
+      await save(updatedDraft);
     }
     reset();
     setSaving(false);
@@ -580,16 +627,18 @@ export function NewsTab() {
               description="خبر كامل له عنوان وتفاصيل وصورة. لو عندك مصدر خارجي أو صفحة تفاصيل طويلة حط الرابط في خانة اللينك."
             />
             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="sm:col-span-2 pb-2 border-b border-border/50">
-                <CategorySelector 
-                  value={getNewsCategoryName(article.category)}
-                  onChange={(val) => setArticle((current) => ({ ...current, category: makeCategoryString('Article', val) }))}
-                  onAdd={handleAddCategory}
-                  onDelete={handleDeleteCategory}
-                  categories={allCategories}
-                  showAdd={true}
-                />
-              </div>
+              {activeLeague === 'worldcup' && (
+                <div className="sm:col-span-2 pb-2 border-b border-border/50">
+                  <CategorySelector 
+                    value={getNewsCategoryName(article.category)}
+                    onChange={(val) => setArticle((current) => ({ ...current, category: makeCategoryString('Article', val) }))}
+                    onAdd={handleAddCategory}
+                    onDelete={handleDeleteCategory}
+                    categories={allCategories}
+                    showAdd={true}
+                  />
+                </div>
+              )}
               <Field label="عنوان الخبر" className="sm:col-span-2">
                 <Input
                   value={article.title_ar}
@@ -789,23 +838,25 @@ export function NewsTab() {
                     className="h-11 text-right"
                   />
                 </Field>
-                <Field label="الدوري المعني">
-                  <Select
-                    value={transferDraft.leagueId}
-                    onValueChange={(val) => setTransferDraft(prev => ({ ...prev, leagueId: val }))}
-                  >
-                    <SelectTrigger className="h-11">
-                      <SelectValue placeholder="اختر الدوري" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values(leaguesConfig).map((l) => (
-                        <SelectItem key={l.id} value={l.id}>
-                          {isAr ? l.nameAr : l.nameEn}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
+                {activeLeague === 'worldcup' && (
+                  <Field label="الدوري المعني">
+                    <Select
+                      value={transferDraft.leagueId}
+                      onValueChange={(val) => setTransferDraft(prev => ({ ...prev, leagueId: val }))}
+                    >
+                      <SelectTrigger className="h-11">
+                        <SelectValue placeholder="اختر الدوري" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(leaguesConfig).map((l) => (
+                          <SelectItem key={l.id} value={l.id}>
+                            {isAr ? l.nameAr : l.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                )}
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">

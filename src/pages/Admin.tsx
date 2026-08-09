@@ -15,12 +15,16 @@ import { MatchesTab } from '@/components/admin/MatchesTab';
 import { ChatModerationTab } from '@/components/admin/ChatModerationTab';
 import { TopScorersTab } from '@/components/admin/TopScorersTab';
 import { ApiKeysTab } from '@/components/admin/ApiKeysTab';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import { t } from '@/lib/i18n';
+import { leaguesConfig } from '@/lib/leaguesConfig';
+import { cn } from '@/lib/utils';
 export default function Admin() {
   const { authed, onLogout } = useAdminAuth();
   const { lang, setLang } = useLanguage();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeLeague = searchParams.get('league') || 'worldcup';
 
   if (!authed) return <AdminGate />;
 
@@ -62,9 +66,44 @@ export default function Admin() {
 
       {/* Main */}
       <main className="container mx-auto px-4 lg:px-8 py-8">
-        <div className="mb-6">
-          <h2 className="font-display font-extrabold text-2xl mb-1">{t('adminControlPanel', lang)}</h2>
-          <p className="text-muted-foreground text-sm">{t('adminControlSub', lang)}</p>
+        <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h2 className="font-display font-extrabold text-2xl mb-1">{t('adminControlPanel', lang)}</h2>
+            <p className="text-muted-foreground text-sm">{t('adminControlSub', lang)}</p>
+          </div>
+          
+          <div className="flex flex-wrap gap-1.5 justify-end max-w-full overflow-x-auto py-1">
+            <Button
+              onClick={() => setSearchParams({ league: 'worldcup' })}
+              variant={activeLeague === 'worldcup' ? 'default' : 'outline'}
+              size="sm"
+              className={cn(
+                "font-bold text-xs rounded-xl h-9 transition-all duration-300",
+                activeLeague === 'worldcup' ? "bg-primary text-primary-foreground shadow-neon shadow-primary/20 scale-105 border-primary" : "border-border hover:bg-white/5"
+              )}
+            >
+              عام / كأس العالم
+            </Button>
+            {Object.values(leaguesConfig).map((l) => (
+              <Button
+                key={l.id}
+                onClick={() => setSearchParams({ league: l.id })}
+                variant={activeLeague === l.id ? 'default' : 'outline'}
+                size="sm"
+                className={cn(
+                  "font-bold text-xs rounded-xl h-9 transition-all duration-300",
+                  activeLeague === l.id 
+                    ? "bg-primary text-primary-foreground shadow-neon shadow-primary/20 scale-105"
+                    : "border-border hover:bg-white/5"
+                )}
+                style={{
+                  borderColor: activeLeague === l.id ? l.colors.accent : undefined
+                }}
+              >
+                {lang === 'ar' ? l.nameAr : l.nameEn}
+              </Button>
+            ))}
+          </div>
         </div>
 
         <Tabs defaultValue="matches">
@@ -102,15 +141,15 @@ export default function Admin() {
           </TabsList>
 
 
-          <TabsContent value="matches"><MatchesTab /></TabsContent>
+          <TabsContent value="matches"><MatchesTab activeLeague={activeLeague} /></TabsContent>
           <TabsContent value="analytics"><AnalyticsTab /></TabsContent>
           <TabsContent value="widgets"><WidgetLabelsTab /></TabsContent>
           <TabsContent value="roadmap"><RoadmapTab /></TabsContent>
           <TabsContent value="ads"><AdsTab /></TabsContent>
-          <TabsContent value="topscorers"><TopScorersTab /></TabsContent>
-          <TabsContent value="news"><NewsTab /></TabsContent>
+          <TabsContent value="topscorers"><TopScorersTab activeLeague={activeLeague} /></TabsContent>
+          <TabsContent value="news"><NewsTab activeLeague={activeLeague} /></TabsContent>
           <TabsContent value="mediaplayer"><MediaPlayerTab /></TabsContent>
-          <TabsContent value="api_keys"><ApiKeysTab /></TabsContent>
+          <TabsContent value="api_keys"><ApiKeysTab activeLeague={activeLeague} /></TabsContent>
           <TabsContent value="chat_moderation"><ChatModerationTab /></TabsContent>
         </Tabs>
       </main>

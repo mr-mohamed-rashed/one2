@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useNewsCategories } from '@/hooks/useNewsCategories';
 import { getCountryFlag } from '@/lib/flags';
+import { leaguesConfig } from '@/lib/leaguesConfig';
 
 interface PlayerStat {
   id: string;
@@ -24,7 +25,7 @@ interface PlayerStat {
 
 type TabType = 'goals' | 'assists' | 'motm' | 'cards';
 
-export function TopScorersTab() {
+export function TopScorersTab({ activeLeague = 'worldcup' }: { activeLeague?: string }) {
   const { categories } = useNewsCategories();
   const [scorers, setScorers] = useState<PlayerStat[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,6 +33,18 @@ export function TopScorersTab() {
   const [editingId, setEditingId] = useState<string | null>(null);
   
   const [tournament, setTournament] = useState('كأس العالم 2026');
+  
+  useEffect(() => {
+    if (activeLeague === 'worldcup') {
+      setTournament('كأس العالم 2026');
+    } else {
+      const league = Object.values(leaguesConfig).find((l) => l.id === activeLeague);
+      if (league) {
+        setTournament(league.nameAr);
+      }
+    }
+  }, [activeLeague]);
+
   const [activeTab, setActiveTab] = useState<TabType>('goals');
   
   const [bulkTexts, setBulkTexts] = useState<Record<TabType, string>>({
@@ -413,27 +426,29 @@ export function TopScorersTab() {
 
   return (
     <div className="space-y-4">
-      <Card className="border-primary/50 bg-gradient-to-r from-primary/10 to-transparent p-5 mb-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h3 className="text-xl font-bold text-primary mb-1">نوع البطولة (الموسم)</h3>
-            <p className="text-sm text-muted-foreground">قم بتحديد البطولة قبل إضافة أو إدخال البيانات</p>
+      {activeLeague === 'worldcup' && (
+        <Card className="border-primary/50 bg-gradient-to-r from-primary/10 to-transparent p-5 mb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-xl font-bold text-primary mb-1">نوع البطولة (الموسم)</h3>
+              <p className="text-sm text-muted-foreground">قم بتحديد البطولة قبل إضافة أو إدخال البيانات</p>
+            </div>
+            <div className="w-full md:w-72">
+              <select
+                value={tournament}
+                onChange={(e) => setTournament(e.target.value)}
+                className="flex h-12 w-full rounded-md border border-primary/50 bg-background px-3 py-2 text-center text-lg font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                dir="rtl"
+              >
+                <option value="كأس العالم 2026">كأس العالم 2026</option>
+                {categories.filter(c => c !== 'News 2026').map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div className="w-full md:w-72">
-            <select
-              value={tournament}
-              onChange={(e) => setTournament(e.target.value)}
-              className="flex h-12 w-full rounded-md border border-primary/50 bg-background px-3 py-2 text-center text-lg font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              dir="rtl"
-            >
-              <option value="كأس العالم 2026">كأس العالم 2026</option>
-              {categories.filter(c => c !== 'News 2026').map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </Card>
+        </Card>
+      )}
 
       <Tabs defaultValue="goals" value={activeTab} onValueChange={(v) => setActiveTab(v as TabType)}>
         <TabsList className="w-full grid grid-cols-2 md:grid-cols-4 h-auto p-1 mb-6 gap-2">

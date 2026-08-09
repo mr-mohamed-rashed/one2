@@ -5,14 +5,41 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Save, Loader2, Video, RefreshCw, Bell, Send, Wand2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useResults, useUpcomingFixtures } from '@/hooks/useFootballData';
-
+import { useResults, useUpcomingFixtures, useLeagueAllFixtures } from '@/hooks/useFootballData';
+import { leaguesConfig } from '@/lib/leaguesConfig';
+import { queryClient } from '@/App';
 import { useToast } from '@/hooks/use-toast';
 
-export function MatchesTab() {
+export function MatchesTab({ activeLeague = 'worldcup' }: { activeLeague?: string }) {
   const { toast } = useToast();
-  const { data: finished = [], isLoading, refetch } = useResults();
-  const { data: upcoming = [], isLoading: isUpcomingLoading } = useUpcomingFixtures();
+  const league = Object.values(leaguesConfig).find((l) => l.id === activeLeague);
+  const { data: leagueFixtures = [], isLoading: isLeagueLoading } = useLeagueAllFixtures(league?.apiLeagueId, league?.season);
+  
+  const { data: finishedWorldCup = [], isLoading: isFinishedWcLoading, refetch: refetchFinished } = useResults();
+  const { data: upcomingWorldCup = [], isLoading: isUpcomingWcLoading } = useUpcomingFixtures();
+  
+  const isWorldCup = activeLeague === 'worldcup';
+  
+  const finished = isWorldCup 
+    ? finishedWorldCup 
+    : leagueFixtures.filter((m) => m.status === 'finished');
+    
+  const upcoming = isWorldCup 
+    ? upcomingWorldCup 
+    : leagueFixtures.filter((m) => m.status === 'upcoming' || m.status === 'live');
+    
+  const isLoading = isWorldCup 
+    ? (isFinishedWcLoading || isUpcomingWcLoading)
+    : isLeagueLoading;
+    
+  const refetch = () => {
+    if (isWorldCup) {
+      refetchFinished();
+    } else {
+      queryClient.invalidateQueries({ queryKey: ['league-fixtures', league?.apiLeagueId] });
+    }
+  };
+
   const [savingId, setSavingId] = useState<string | null>(null);
   const [urls, setUrls] = useState<Record<string, string>>({});
 

@@ -19,13 +19,17 @@ const API_KEY_ITEMS = [
   { key: 'api_key_epl_egypt', labelAr: 'مفتاح الدوري المصري الممتاز', labelEn: 'Egyptian Premier League API Key', fallbackKey: '19a3b0d1fe31969b6b6e615f1c38fccd' },
 ];
 
-export function ApiKeysTab() {
+export function ApiKeysTab({ activeLeague = 'worldcup' }: { activeLeague?: string }) {
   const { lang } = useLanguage();
   const isAr = lang === 'ar';
   const { settings, loading, save } = useSiteSettings();
   const [saving, setSaving] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
   const [edits, setEdits] = useState<Record<string, string>>({});
+
+  const displayedKeys = activeLeague === 'worldcup'
+    ? API_KEY_ITEMS
+    : API_KEY_ITEMS.filter((item) => item.key === `api_key_${activeLeague}`);
 
   const getVal = (key: string, fallback: string) => {
     if (edits[key] !== undefined) return edits[key];
@@ -78,7 +82,7 @@ export function ApiKeysTab() {
 
       <Card className="border-border bg-gradient-card p-5 space-y-4">
         <div className="space-y-3">
-          {API_KEY_ITEMS.map(({ key, labelAr, labelEn, fallbackKey }) => (
+          {displayedKeys.map(({ key, labelAr, labelEn, fallbackKey }) => (
             <div 
               key={key} 
               className="grid gap-4 rounded-xl border border-white/5 bg-black/40 p-4 sm:grid-cols-[1fr_auto] items-end"
