@@ -207,6 +207,9 @@ export function NewsTab() {
         description: 'تأكد من اتصالك بالإنترنت وحاول مجدداً.',
         variant: 'destructive',
       });
+    } finally {
+      setImporting(false);
+    }
   };
 
   const blankTransferDraft = () => ({
