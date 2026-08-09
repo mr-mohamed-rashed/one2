@@ -548,8 +548,8 @@ export function NewsTab({ activeLeague = 'worldcup' }: { activeLeague?: string }
               description="سطر قصير يظهر في شريط الأخبار المتحرك. اكتب السطر واضغط حفظ."
             />
             <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-              <div className="flex-1 flex gap-3">
-                <Field label="نص الشريط الإخباري" className="flex-1">
+              <div className="flex-1">
+                <Field label="نص الشريط الإخباري" className="w-full">
                   <Input
                     value={ticker.title_ar}
                     onChange={(event) => setTicker((current) => ({ ...current, title_ar: event.target.value }))}
@@ -558,14 +558,6 @@ export function NewsTab({ activeLeague = 'worldcup' }: { activeLeague?: string }
                     placeholder="مثال: قرعة نارية في دور المجموعات..."
                   />
                 </Field>
-                <div className="w-[180px] shrink-0">
-                  <CategorySelector 
-                    value={getNewsCategoryName(ticker.category)}
-                    onChange={(val) => setTicker((current) => ({ ...current, category: makeCategoryString('Ticker', val) }))}
-                    onDelete={handleDeleteCategory}
-                    categories={allCategories}
-                  />
-                </div>
               </div>
               <Button
                 onClick={() => addItem(ticker, () => setTicker(blankTicker()))}
@@ -627,18 +619,7 @@ export function NewsTab({ activeLeague = 'worldcup' }: { activeLeague?: string }
               description="خبر كامل له عنوان وتفاصيل وصورة. لو عندك مصدر خارجي أو صفحة تفاصيل طويلة حط الرابط في خانة اللينك."
             />
             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {activeLeague === 'worldcup' && (
-                <div className="sm:col-span-2 pb-2 border-b border-border/50">
-                  <CategorySelector 
-                    value={getNewsCategoryName(article.category)}
-                    onChange={(val) => setArticle((current) => ({ ...current, category: makeCategoryString('Article', val) }))}
-                    onAdd={handleAddCategory}
-                    onDelete={handleDeleteCategory}
-                    categories={allCategories}
-                    showAdd={true}
-                  />
-                </div>
-              )}
+
               <Field label="عنوان الخبر" className="sm:col-span-2">
                 <Input
                   value={article.title_ar}
@@ -712,7 +693,7 @@ export function NewsTab({ activeLeague = 'worldcup' }: { activeLeague?: string }
               title="نبض 2026"
               description="كارت خفيف في الرئيسية: عنوان قصير وتايتل/تصنيف فقط."
             />
-            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Field label="عنوان النبض" className="sm:col-span-1">
                 <Input
                   value={pulse.title_ar}
@@ -731,14 +712,6 @@ export function NewsTab({ activeLeague = 'worldcup' }: { activeLeague?: string }
                   placeholder="Title / tag"
                 />
               </Field>
-              <div className="sm:col-span-1">
-                <CategorySelector 
-                  value={getNewsCategoryName(pulse.category)}
-                  onChange={(val) => setPulse((current) => ({ ...current, category: makeCategoryString('Pulse', val) }))}
-                  onDelete={handleDeleteCategory}
-                  categories={allCategories}
-                />
-              </div>
               <div className="flex gap-2 sm:col-span-2">
                 <Button
                   onClick={() => addItem(pulse, () => setPulse(blankPulse()))}
