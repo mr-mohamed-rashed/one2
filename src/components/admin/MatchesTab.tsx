@@ -170,7 +170,7 @@ export function MatchesTab({ activeLeague = 'worldcup' }: { activeLeague?: strin
           <Bell className="h-5 w-5 text-primary" />
           إرسال إشعارات (المباراة القادمة)
         </h3>
-        {isUpcomingLoading ? (
+        {isLoading ? (
           <div className="flex justify-center py-8">
              <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
