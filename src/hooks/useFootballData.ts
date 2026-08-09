@@ -772,10 +772,32 @@ function mapScorer(s: ApiScorer, i: number) {
 
 // ---------- League-Specific Hooks (API-Football Direct) ----------
 
-const getApiKeyForLeagueId = (apiLeagueId?: number) => {
-  if (!apiLeagueId) return '19a3b0d1fe31969b6b6e615f1c38fccd';
+const keysCache: Record<string, string> = {};
+
+const getApiKeyForLeagueId = async (apiLeagueId?: number): Promise<string> => {
+  const defaultKey = '19a3b0d1fe31969b6b6e615f1c38fccd';
+  if (!apiLeagueId) return defaultKey;
   const league = Object.values(leaguesConfig).find((l) => l.apiLeagueId === apiLeagueId);
-  return league?.apiKey || '19a3b0d1fe31969b6b6e615f1c38fccd';
+  if (!league) return defaultKey;
+  
+  if (keysCache[league.id]) {
+    return keysCache[league.id];
+  }
+
+  try {
+    const { data } = await supabase
+      .from('site_settings')
+      .select('value_en')
+      .eq('key', `api_key_${league.id}`)
+      .single();
+    if (data?.value_en) {
+      keysCache[league.id] = data.value_en;
+      return data.value_en;
+    }
+  } catch (err) {
+    console.error('Failed to load api key from supabase:', err);
+  }
+  return league.apiKey || defaultKey;
 };
 
 export function useLeagueAllFixtures(leagueId?: number, season?: number) {
@@ -784,11 +806,12 @@ export function useLeagueAllFixtures(leagueId?: number, season?: number) {
     queryFn: async () => {
       if (!leagueId || !season) return [];
       try {
+        const apiKey = await getApiKeyForLeagueId(leagueId);
         const response = await fetch(`https://v3.football.api-sports.io/fixtures?league=${leagueId}&season=${season}`, {
           method: 'GET',
           headers: {
             'x-rapidapi-host': 'v3.football.api-sports.io',
-            'x-rapidapi-key': getApiKeyForLeagueId(leagueId)
+            'x-rapidapi-key': apiKey
           }
         });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -838,11 +861,12 @@ export function useLeagueStandings(leagueId?: number, season?: number) {
     queryFn: async () => {
       if (!leagueId || !season) return [];
       try {
+        const apiKey = await getApiKeyForLeagueId(leagueId);
         const response = await fetch(`https://v3.football.api-sports.io/standings?league=${leagueId}&season=${season}`, {
           method: 'GET',
           headers: {
             'x-rapidapi-host': 'v3.football.api-sports.io',
-            'x-rapidapi-key': getApiKeyForLeagueId(leagueId)
+            'x-rapidapi-key': apiKey
           }
         });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -898,11 +922,12 @@ export function useLeagueTopScorers(leagueId?: number, season?: number) {
     queryFn: async () => {
       if (!leagueId || !season) return [];
       try {
+        const apiKey = await getApiKeyForLeagueId(leagueId);
         const response = await fetch(`https://v3.football.api-sports.io/players/topscorers?league=${leagueId}&season=${season}`, {
           method: 'GET',
           headers: {
             'x-rapidapi-host': 'v3.football.api-sports.io',
-            'x-rapidapi-key': getApiKeyForLeagueId(leagueId)
+            'x-rapidapi-key': apiKey
           }
         });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);

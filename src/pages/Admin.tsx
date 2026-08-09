@@ -1,4 +1,4 @@
-import { LogOut, Settings, Megaphone, Newspaper, LayoutGrid, Layers, CheckCircle, XCircle, AlertCircle, Activity, PlayCircle, Video, Trophy, ShieldAlert } from 'lucide-react';
+import { LogOut, Settings, Megaphone, Newspaper, LayoutGrid, Layers, CheckCircle, XCircle, AlertCircle, Activity, PlayCircle, Video, Trophy, ShieldAlert, Key } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +14,7 @@ import { AnalyticsTab } from '@/components/admin/AnalyticsTab';
 import { MatchesTab } from '@/components/admin/MatchesTab';
 import { ChatModerationTab } from '@/components/admin/ChatModerationTab';
 import { TopScorersTab } from '@/components/admin/TopScorersTab';
+import { ApiKeysTab } from '@/components/admin/ApiKeysTab';
 import { NavLink } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import { t } from '@/lib/i18n';
@@ -92,6 +93,9 @@ export default function Admin() {
             <TabsTrigger value="mediaplayer" className="gap-2 font-semibold data-[state=active]:bg-background data-[state=active]:text-foreground">
               <PlayCircle className="h-4 w-4" /> {t('adminMediaPlayer', lang)}
             </TabsTrigger>
+            <TabsTrigger value="api_keys" className="gap-2 font-semibold data-[state=active]:bg-background data-[state=active]:text-foreground text-primary">
+              <Key className="h-4 w-4" /> {lang === 'ar' ? 'مفاتيح الـ API' : 'API Keys'}
+            </TabsTrigger>
             <TabsTrigger value="chat_moderation" className="gap-2 font-semibold data-[state=active]:bg-background data-[state=active]:text-foreground text-destructive">
               <ShieldAlert className="h-4 w-4" /> {lang === 'ar' ? 'مراقبة الشات' : 'Chat Moderation'}
             </TabsTrigger>
@@ -106,6 +110,7 @@ export default function Admin() {
           <TabsContent value="topscorers"><TopScorersTab /></TabsContent>
           <TabsContent value="news"><NewsTab /></TabsContent>
           <TabsContent value="mediaplayer"><MediaPlayerTab /></TabsContent>
+          <TabsContent value="api_keys"><ApiKeysTab /></TabsContent>
           <TabsContent value="chat_moderation"><ChatModerationTab /></TabsContent>
         </Tabs>
       </main>

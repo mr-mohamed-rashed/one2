@@ -281,9 +281,13 @@ export function NewsTab() {
       for (const team of topTeams) {
         setTransferImportLog((prev) => [...prev, `جاري جلب انتقالات نادي ${team.name}...`]);
         
-        // Get apiKey for this league
-        const league = leaguesConfig[team.league];
-        const apiKey = league?.apiKey || '19a3b0d1fe31969b6b6e615f1c38fccd';
+        // Get apiKey for this league from site_settings or fallback
+        const { data: apiKeySetting } = await supabase
+          .from('site_settings')
+          .select('value_en')
+          .eq('key', `api_key_${team.league}`)
+          .single();
+        const apiKey = apiKeySetting?.value_en || leaguesConfig[team.league]?.apiKey || '19a3b0d1fe31969b6b6e615f1c38fccd';
 
         const response = await fetch(
           `https://v3.football.api-sports.io/transfers?team=${team.id}`,
